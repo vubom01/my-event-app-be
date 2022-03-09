@@ -3,13 +3,12 @@ from sqlalchemy.orm import Session
 
 from app.api import deps
 from app.schemas.sche_user import UserDetail
-
-from app.services.srv_user import srv_user
+from app.services.srv_user import UserService
 
 
 def login_required(db: Session = Depends(deps.get_db),
-                   http_authorization_credentials=Depends(srv_user.reusable_oauth2)):
-    return srv_user.get_current_user(db, http_authorization_credentials)
+                   http_authorization_credentials=Depends(UserService.reusable_oauth2)):
+    return UserService.get_current_user(db, http_authorization_credentials)
 
 
 class PermissionRequired:
