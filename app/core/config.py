@@ -32,5 +32,9 @@ class Settings(BaseSettings):
     MYSQL_DB = os.getenv('MYSQL_DB')
     DATABASE_URI = f"mysql+mysqldb://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_SERVER}/{MYSQL_DB}"
 
+    ACCESS_TOKEN_EXPIRE_SECONDS: int = 60 * 60 * 24 * 7  # Token expired after 7 days
+    SECRET_KEY = os.getenv('SECRET_KEY', '')
+    SECURITY_ALGORITHM = os.getenv('SECURITY_ALGORITHM', '')
+
 
 settings = Settings()
