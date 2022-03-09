@@ -23,9 +23,13 @@ async def get_current_user(request: Request = None, raw_token=Depends(authorize_
         if not isinstance(token, str):
             token = token.credentials
         payload = Auth0Service().verify(token)
-        # if authenticated command request then logging email, api url
+
         if not payload:
             raise Unauthorized
+
+        if payload.get("status") == "error":
+            raise Unauthorized
+
         iam_info = UserDetail(id=payload.get('sub'))
         iam_info.name = payload.get('https://name.com')
         iam_info.email = payload.get('email')
