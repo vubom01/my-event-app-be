@@ -27,11 +27,6 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     def get(self, db: Session, id: Any) -> Optional[ModelType]:
         return db.query(self.model).filter(self.model.id == id).first()
 
-    def get_multi(self, db: Session, *, skip: int = 0, limit: int = None) -> List[ModelType]:
-        if limit:
-            return db.query(self.model).offset(skip).limit(limit).all()
-        return db.query(self.model).offset(skip).all()
-
     def create(self, db: Session, *, obj_in: CreateSchemaType, **data) -> ModelType:
         if data.get('by_alias') is not None:
             obj_in_data = jsonable_encoder(obj_in, by_alias=data.get('by_alias'))
