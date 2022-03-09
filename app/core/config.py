@@ -14,4 +14,17 @@ class Settings(BaseSettings):
     RUNNING_PORT = os.getenv('RUNNING_PORT', '')
     BACKEND_CORS_ORIGINS = ['*']
 
+    AUTH0_CLIENT_ID = os.getenv('AUTH0_CLIENT_ID', '')
+    AUTH0_CLIENT_SECRET = os.getenv('AUTH0_CLIENT_SECRET', '')
+    AUTH0_DOMAIN = os.getenv('AUTH0_DOMAIN', '')
+    AUTH0_AUDIENCE = os.getenv('AUTH0_AUDIENCE', '')
+    AUTH0_BASE_URL = os.getenv('AUTH0_BASE_URL', '')
+    AUTH0_ALGO = os.getenv('AUTH0_ALGO', '')
+
+    DOMAIN = os.getenv('DOMAIN', '')
+    API_AUDIENCE = os.getenv('API_AUDIENCE', '')
+    ALGORITHMS = os.getenv('ALGORITHMS', '')
+    ISSUER = os.getenv('ISSUER', '')
+
+
 settings = Settings()

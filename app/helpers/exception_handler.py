@@ -66,3 +66,48 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         content=jsonable_encoder(
             {"code": "001", "message": get_message(exc.errors()[0])}),
     )
+
+
+class ObjectNotFound(CustomException):
+    def __init__(self, obj: str):
+        super().__init__(http_code=400, code="404", message=f"{obj} not found")
+
+
+class UrlNotFound(CustomException):
+    def __init__(self, obj: str):
+        super().__init__(http_code=404, code="404", message=f"{obj} not found")
+
+
+class FieldIsRequired(CustomException):
+    def __init__(self, field_name: str):
+        super().__init__(http_code=400, code="402", message=f"{field_name} is required")
+
+
+class URLNotFound(CustomException):
+    def __init__(self, url: str):
+        super().__init__(http_code=404, code="404", message=f"{url} not found")
+
+
+class InvalidFieldFormat(CustomException):
+    def __init__(self, field_name: str):
+        super().__init__(http_code=400, code="417", message=f"{field_name} format is invalid")
+
+
+class InvalidField(CustomException):
+    def __init__(self, field_name: str):
+        super().__init__(http_code=400, code="420", message=f"{field_name} is invalid")
+
+
+class Unauthorized(CustomException):
+    def __init__(self):
+        super().__init__(http_code=401, code="401", message=f"Unauthorized")
+
+
+class PermissionDenied(CustomException):
+    def __init__(self):
+        super().__init__(http_code=403, code="403", message=f"Permission denied")
+
+
+class InternalServerError(CustomException):
+    def __init__(self):
+        super().__init__(http_code=500, code="500", message="Internal server error")
