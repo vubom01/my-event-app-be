@@ -42,3 +42,6 @@ class DataResponse(ResponseSchemaBase, GenericModel, Generic[T]):
         return self
 
 
+class ItemBaseModel(BaseModel):
+    class Config:
+        orm_mode = True

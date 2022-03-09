@@ -26,5 +26,11 @@ class Settings(BaseSettings):
     ALGORITHMS = os.getenv('ALGORITHMS', '')
     ISSUER = os.getenv('ISSUER', '')
 
+    MYSQL_SERVER = os.getenv('MYSQL_SERVER')
+    MYSQL_USER = os.getenv('MYSQL_USER')
+    MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD')
+    MYSQL_DB = os.getenv('MYSQL_DB')
+    DATABASE_URI = f"mysql+mysqldb://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_SERVER}/{MYSQL_DB}"
+
 
 settings = Settings()
