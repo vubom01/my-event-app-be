@@ -5,7 +5,9 @@ from fastapi import Depends, HTTPException
 from fastapi.security import HTTPBearer
 from pydantic import ValidationError
 from starlette import status
+from sqlalchemy.orm import Session
 
+from app.api import deps
 from app.core.config import settings
 from app.core.security import get_password_hash, verify_password
 from app.crud.crud_user import crud_user
@@ -33,7 +35,7 @@ class UserService:
         return user
 
     @staticmethod
-    def get_current_user(db=None, http_authorization_credentials=Depends(reusable_oauth2)):
+    def get_current_user(db: Session = Depends(deps.get_db), http_authorization_credentials=Depends(reusable_oauth2)):
         try:
             payload = jwt.decode(
                 http_authorization_credentials.credentials, settings.SECRET_KEY,
