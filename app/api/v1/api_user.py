@@ -1,8 +1,5 @@
 from fastapi import APIRouter, Depends
-from pydantic.main import BaseModel
-from sqlalchemy.orm import Session
 
-from app.api import deps
 from app.helpers.login_manager import login_required
 from app.schemas.sche_base import DataResponse
 from app.schemas.sche_user import UserDetail

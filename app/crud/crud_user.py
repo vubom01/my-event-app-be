@@ -6,8 +6,11 @@ from app.models.user_model import User
 
 class CRUDUser(CRUDBase[UserDetail, UserDetail, UserDetail]):
 
-    def get_user_by_username(self, db: Session, username: str):
-        return db.query(self.model).filter(self.model.username == username).first()
+    def get_user_by_filter(self, db: Session, username: str = None, email: str = None):
+        if username:
+            return db.query(self.model).filter(self.model.username == username).first()
+        if email:
+            return db.query(self.model).filter(self.model.email == email).first()
 
 
 crud_user = CRUDUser(User)
