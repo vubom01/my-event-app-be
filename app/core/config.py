@@ -36,5 +36,9 @@ class Settings(BaseSettings):
     SECRET_KEY = os.getenv('SECRET_KEY', '')
     SECURITY_ALGORITHM = os.getenv('SECURITY_ALGORITHM', '')
 
+    CLOUD_NAME = os.getenv('CLOUD_NAME')
+    API_KEY = os.getenv('API_KEY')
+    API_SECRET = os.getenv('API_SECRET')
+
 
 settings = Settings()
