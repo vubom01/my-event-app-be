@@ -41,19 +41,23 @@ class UserService:
         return user
 
     @staticmethod
-    def get_current_user(db: Session = Depends(deps.get_db), http_authorization_credentials=Depends(reusable_oauth2)):
-        try:
-            payload = jwt.decode(
-                http_authorization_credentials.credentials, settings.SECRET_KEY,
-                algorithms=[settings.SECURITY_ALGORITHM]
-            )
-            token_data = TokenPayload(**payload)
-        except(jwt.PyJWTError, ValidationError):
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Could not validate credentials",
-            )
-        return crud_user.get(db=db, id=token_data.user_id)
+    def get_current_user(db: Session = Depends(deps.get_db), http_authorization_credentials=Depends(reusable_oauth2),
+                         user_id: int = None):
+        if user_id is not None:
+            return crud_user.get(db=db, id=user_id)
+        else:
+            try:
+                payload = jwt.decode(
+                    http_authorization_credentials.credentials, settings.SECRET_KEY,
+                    algorithms=[settings.SECURITY_ALGORITHM]
+                )
+                token_data = TokenPayload(**payload)
+            except(jwt.PyJWTError, ValidationError):
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail=f"Could not validate credentials",
+                )
+            return crud_user.get(db=db, id=token_data.user_id)
 
     @staticmethod
     def create_user(db=None, user: UserDetail = None):

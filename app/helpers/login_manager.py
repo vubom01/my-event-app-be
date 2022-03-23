@@ -1,3 +1,6 @@
+import json
+import requests
+
 from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -8,6 +11,12 @@ from app.services.srv_user import UserService
 
 def login_required(db: Session = Depends(deps.get_db),
                    http_authorization_credentials=Depends(UserService.reusable_oauth2)):
+    url = f"https://graph.facebook.com/me?access_token={http_authorization_credentials.credentials}" \
+          f"&fields=id,name,email,picture.height(500)"
+    response = requests.request("GET", url)
+    if response.status_code == 200:
+        user = json.loads(response.text)
+        return UserService.get_current_user(db, http_authorization_credentials, user_id=user.get('id'))
     return UserService.get_current_user(db, http_authorization_credentials)
 
 
