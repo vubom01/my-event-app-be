@@ -9,12 +9,12 @@ from app.core.config import settings
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-def create_access_token(user_id: Union[int, Any]) -> str:
+def create_access_token(user_id: Union[str, Any]) -> str:
     expire = datetime.utcnow() + timedelta(
         seconds=settings.ACCESS_TOKEN_EXPIRE_SECONDS
     )
     to_encode = {
-        "exp": expire, "user_id": str(user_id)
+        "exp": expire, "user_id": user_id
     }
     encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.SECURITY_ALGORITHM)
     return encoded_jwt

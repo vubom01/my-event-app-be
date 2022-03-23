@@ -5,7 +5,7 @@ from app.schemas.sche_base import ItemBaseModel
 
 
 class UserDetail(ItemBaseModel):
-    id: Optional[int]
+    id: Optional[str]
     username: Optional[str]
     first_name: Optional[str]
     last_name: Optional[str]
