@@ -1,32 +1,15 @@
-from msilib.schema import File
-import jwt
 import logging
 
-from fastapi import Depends, HTTPException
-from fastapi.security import HTTPBearer
-from pydantic import ValidationError
-from starlette import status
-from sqlalchemy.orm import Session
-
-from app.api import deps
-from app.core.config import settings
-from app.core.security import get_password_hash, verify_password
-from app.crud.crud_user import crud_user
-from app.helpers.exception_handler import CustomException
-from app.schemas.sche_token import TokenPayload
-from app.schemas.sche_user import UserDetail
 import cloudinary.uploader
 import app.core.connection
 
+from typing import List
+from fastapi import HTTPException, File
+
 logger = logging.getLogger()
 
+
 class CommonService:
-
-    __instance = None
-
-    reusable_oauth2 = HTTPBearer(
-        scheme_name = 'Authorization'
-    )
 
     @staticmethod
     def upload_image(image: File):
@@ -36,3 +19,14 @@ class CommonService:
         return {
             'url': url
         }
+
+    @staticmethod
+    def upload_list_images(images: List[File]):
+        urls = []
+        for image in images:
+            file_name = " ".join(image.filename.strip().split())
+            file_ext = file_name.split('.')[-1]
+            if file_ext.lower() not in ('jpg', 'png', 'jpeg'):
+                raise HTTPException(status_code=400, detail='Can not upload file ' + image.filename)
+            urls.append(CommonService.upload_image(image=image.file))
+        return urls
