@@ -13,7 +13,7 @@ from app.core.security import get_password_hash, verify_password
 from app.crud.crud_user import crud_user
 from app.helpers.exception_handler import CustomException
 from app.schemas.sche_token import TokenPayload
-from app.schemas.sche_user import UserDetail
+from app.schemas.sche_user import UserDetail, UserUpdateRequest
 
 logger = logging.getLogger()
 
@@ -65,3 +65,13 @@ class UserService:
         user.password = get_password_hash(user.password)
         user = crud_user.create(db=db, obj_in=user)
         return user
+
+    @staticmethod
+    def update_user(db=None, user: UserUpdateRequest = None, user_id: str = None):
+        if crud_user.get_user_by_filter(db=db, email=user.email):
+            raise CustomException(http_code=400, message='Email is already in use')
+
+        user_detail = crud_user.get(db=db, id=user_id)
+
+        crud_user.update(db=db, db_obj=user_detail, obj_in=user.dict(exclude_none=True))
+        return

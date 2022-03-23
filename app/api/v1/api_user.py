@@ -1,8 +1,10 @@
 from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
 
+from app.api import deps
 from app.helpers.login_manager import login_required
 from app.schemas.sche_base import DataResponse
-from app.schemas.sche_user import UserDetail
+from app.schemas.sche_user import UserDetail, UserUpdateRequest
 from app.services.srv_user import UserService
 
 router = APIRouter()
@@ -13,3 +15,8 @@ def detail(current_user: UserDetail = Depends(UserService.get_current_user)):
     return DataResponse().success_response(data=current_user)
 
 
+@router.put('/me', dependencies=[Depends(login_required)])
+def update(current_user: UserDetail = Depends(UserService.get_current_user), db: Session = Depends(deps.get_db),
+           request: UserUpdateRequest = None):
+    user = UserService.update_user(db=db, user=request, user_id=current_user.id)
+    return DataResponse().success_response(data=user)

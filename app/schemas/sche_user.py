@@ -19,5 +19,13 @@ class UserDetailRequest(UserDetail):
     password: Optional[str]
 
 
+class UserUpdateRequest(ItemBaseModel):
+    first_name: Optional[str]
+    last_name: Optional[str]
+    email: Optional[str]
+    phone_number: Optional[str]
+    gender: Optional[str]
+    dob: Optional[date]
+
 
 
