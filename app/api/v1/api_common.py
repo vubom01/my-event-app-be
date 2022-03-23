@@ -4,7 +4,6 @@ from sqlalchemy.orm import Session
 from app.services.srv_common import CommonService
 from app.helpers.login_manager import login_required
 from fastapi_mail import FastMail, MessageSchema
-from
 router = APIRouter()
 
 @router.post('/upload')
