@@ -26,6 +26,7 @@ class UserUpdateRequest(ItemBaseModel):
     phone_number: Optional[str]
     gender: Optional[str]
     dob: Optional[date]
+    avatar: Optional[str]
 
 
 
