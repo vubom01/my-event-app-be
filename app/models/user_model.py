@@ -11,12 +11,12 @@ class User(BareBaseModel):
 
     username = Column(String, nullable=False)
     password = Column(String, nullable=False)
-    first_name = Column(String, nullable=False)
-    last_name = Column(String, nullable=False)
+    first_name = Column(String, nullable=True)
+    last_name = Column(String, nullable=True)
     email = Column(String, nullable=False)
-    phone_number = Column(String, nullable=False)
-    gender = Column(String, nullable=False)
-    dob = Column(String, nullable=False)
+    phone_number = Column(String, nullable=True)
+    gender = Column(String, nullable=True)
+    dob = Column(String, nullable=True)
     avatar = Column(String, nullable=True)
 
     def public_info_to_client(self) -> dict:
