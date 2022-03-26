@@ -1,4 +1,4 @@
-from typing import Generic, TypeVar, Type, Any, Optional, List, Union, Dict
+from typing import Generic, TypeVar, Type, Any, Optional, List, Union, Dict, Sequence
 
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
@@ -38,6 +38,16 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         db.refresh(db_obj)
         return db_obj
 
+    def create_multi(self, db: Session, *, list_obj_in: Sequence[CreateSchemaType]) -> Sequence[ModelType]:
+        list_db_obj = []
+        for obj_in in list_obj_in:
+            obj_in_data = jsonable_encoder(obj_in)
+            db_obj = self.model(**obj_in_data)
+            list_db_obj.append(db_obj)
+        db.add_all(list_db_obj)
+        db.commit()
+        return list_db_obj
+
     def update(
             self,
             db: Session,
@@ -57,4 +67,6 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         db.commit()
         db.refresh(db_obj)
         return db_obj
+
+
 
