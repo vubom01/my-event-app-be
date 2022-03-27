@@ -13,6 +13,7 @@ class UserDetail(ItemBaseModel):
     phone_number: Optional[str]
     gender: Optional[str]
     dob: Optional[date]
+    avatar: Optional[str]
 
 
 class UserDetailRequest(UserDetail):
