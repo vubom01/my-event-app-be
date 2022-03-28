@@ -13,9 +13,7 @@ class EventDetail(ItemBaseModel):
     description: Optional[str]
     status: Optional[int]
     lat: Optional[float]
-    lat_delta: Optional[float]
     long: Optional[float]
-    long_delta: Optional[float]
 
 
 class EventCreateRequest(EventDetail):

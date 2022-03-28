@@ -17,9 +17,7 @@ class Event(BareBaseModel):
     description = Column(String, nullable=False)
     status = Column(Integer, nullable=False)
     lat = Column(Float, nullable=True)
-    lat_delta = Column(Float, nullable=True)
     long = Column(Float, nullable=True)
-    long_delta = Column(Float, nullable=True)
 
     def public_info_to_client(self) -> dict:
         return {
