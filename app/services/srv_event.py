@@ -23,9 +23,8 @@ class EventService:
                 event_id=response.id,
                 image=image
             )
-            crud_event_image.create(db=db, obj_in=image_request)
             image_requests.append(image_request)
-        # crud_event_image.create_multi(db=db, list_obj_in=image_requests)
+        crud_event_image.create_multi(db=db, list_obj_in=image_requests)
 
         return {
             "id": response.id
