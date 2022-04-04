@@ -36,10 +36,22 @@ class FriendService:
         return fried_requests
 
     @staticmethod
-    def approve_fried_request(db=None, friend_request_id: int = None, status: int = None):
+    def approve_fried_request(db=None, friend_request_id: int = None, status: int = None, user_id: int = None):
+        friend_request = crud_friend.get(db=db, id=friend_request_id)
+        if friend_request is None:
+            raise CustomException(http_code=400, message="Not found")
+        if friend_request.user_id != user_id:
+            raise CustomException(http_code=400, message="Don't have permission")
+
         resp = None
         if status == 0:
             resp = crud_friend.remove(db=db, id=friend_request_id)
         if status == 1:
+            friend = FriendRequestDetail(
+                user_id=friend_request.friend_id,
+                friend_id=user_id,
+                status=1
+            )
+            crud_friend.create(db=db, obj_in=friend)
             resp = crud_friend.accept_friend_request(db=db, friend_request_id=friend_request_id)
         return resp
