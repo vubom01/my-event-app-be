@@ -2,8 +2,12 @@ from typing import Generic, TypeVar, Type, Any, Optional, List, Union, Dict, Seq
 
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
-from sqlalchemy.orm import Session
+from sqlalchemy import text
+from sqlalchemy.orm import Session, Query
+from sqlalchemy.exc import DataError
 
+from app.helpers.exception_handler import ValidateException
+from app.helpers.paging import Pagination, Page, PaginationParams, PageType
 from app.models.base_model import Base
 
 
@@ -68,5 +72,30 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         db.refresh(db_obj)
         return db_obj
 
+    def paginate(self, query: Query, params: Optional[PaginationParams] = None) -> Page:
+        try:
+            total = query.count()
+            if params.page == 0:
+                params.page = 1
+
+            items = query.order_by(text(f"{params.sort_by} {params.direction}")) \
+                .offset(params.page_size * (params.page - 1)).limit(params.page_size).all()
+
+            total_page = (total - 1) // params.page_size + 1
+
+            pagination = Pagination(
+                current_page=params.page,
+                page_size=params.page_size,
+                total_items=total,
+                total_pages=total_page
+            )
+
+        except Exception as e:
+            print(e)
+            if type(e) == DataError:
+                raise ValidateException("008", "Các toán tử tìm kiếm không phù hợp với trường hoặc giá trị tìm kiếm")
+            raise Exception("Lỗi Paging")
+
+        return PageType.get().create(total, items, pagination)
 
 
