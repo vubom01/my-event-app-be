@@ -20,9 +20,10 @@ def send_friend_request(current_user: UserDetail = Depends(login_required), requ
 
 
 @router.put('/{friend_request_id}', dependencies=[Depends(login_required)])
-def approve_friend_request(current_user: UserDetail = Depends(login_required),
-                           db: Session = Depends(deps.get_db), friend_request_id: int = None):
-    pass
+def approve_friend_request(req_data: FriendRequest = None, db: Session = Depends(deps.get_db),
+                           friend_request_id: int = None):
+    response = FriendService.approve_fried_request(db=db, friend_request_id=friend_request_id, status=req_data.status)
+    return DataResponse().success_response(data=response)
 
 
 @router.get('', dependencies=[Depends(login_required)], response_model=DataResponse[ListFriendRequest])

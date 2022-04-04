@@ -11,7 +11,7 @@ class FriendRequestDetail(ItemBaseModel):
 
 
 class FriendRequest(ItemBaseModel):
-    friend_id: str
+    status: int
 
 
 class FriendDetail(ItemBaseModel):

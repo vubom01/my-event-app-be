@@ -21,5 +21,10 @@ class CRUDFriend(CRUDBase[FriendRequestDetail, FriendRequestDetail, FriendReques
         resp = self.paginate(query=query, params=pagination)
         return resp
 
+    def accept_friend_request(self, db: Session, friend_request_id: int):
+        friend_request = self.get(db=db, id=friend_request_id)
+        resp = self.update(db=db, db_obj=friend_request, obj_in={'status': 1})
+        return resp
+
 
 crud_friend = CRUDFriend(Friend)
