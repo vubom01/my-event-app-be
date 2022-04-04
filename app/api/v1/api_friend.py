@@ -27,9 +27,17 @@ def approve_friend_request(req_data: ApproveFriendRequest = None, db: Session = 
     return DataResponse().success_response(data=response)
 
 
-@router.get('', dependencies=[Depends(login_required)], response_model=DataResponse[ListFriendRequest])
+@router.get('/request', dependencies=[Depends(login_required)], response_model=DataResponse[ListFriendRequest])
 def get_list_friend_requests(current_user: UserDetail = Depends(login_required),
                              pagination: PaginationParamsRequest = Depends(), db: Session = Depends(deps.get_db)):
     response = FriendService.get_list_friend_request(db=db, page=pagination.page, page_size=pagination.page_size,
                                                      user_id=current_user.id)
+    return DataResponse().success_response(data=response)
+
+
+@router.get('')
+def get_list_friends(current_user: UserDetail = Depends(login_required),
+                     pagination: PaginationParamsRequest = Depends(), db: Session = Depends(deps.get_db)):
+    response = FriendService.get_list_friends(db=db, user_id=current_user.id,
+                                              page=pagination.page, page_size=pagination.page_size)
     return DataResponse().success_response(data=response)

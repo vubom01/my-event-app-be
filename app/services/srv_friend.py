@@ -55,3 +55,8 @@ class FriendService:
             crud_friend.create(db=db, obj_in=friend)
             resp = crud_friend.accept_friend_request(db=db, friend_request_id=friend_request_id)
         return resp
+
+    @staticmethod
+    def get_list_friends(db=None, user_id: int = None, page: int = None, page_size: int = None):
+        resp = crud_friend.get_list_friends(db=db, page=page, page_size=page_size, user_id=user_id)
+        return resp
