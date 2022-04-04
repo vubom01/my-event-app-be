@@ -11,7 +11,7 @@ class FriendRequestDetail(ItemBaseModel):
 
 
 class FriendRequest(ItemBaseModel):
-    status: int
+    friend_id: str
 
 
 class FriendDetail(ItemBaseModel):
@@ -23,3 +23,6 @@ class ListFriendRequest(ItemBaseModel):
     items: List[FriendDetail]
     pagination: PaginationParamsResponse
 
+
+class ApproveFriendRequest(ItemBaseModel):
+    status: int

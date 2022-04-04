@@ -18,13 +18,13 @@ class FriendService:
         if user is None:
             raise CustomException(http_code=400, message='User is not found')
 
-        friend_request = crud_friend.get_friend_request(db=db, user_id=user_id, friend_id=request.friend_id)
+        friend_request = crud_friend.get_friend_request(db=db, user_id=request.friend_id, friend_id=user_id)
         if friend_request:
             raise CustomException(http_code=400, message='Request has been sent')
 
         friend = FriendRequestDetail(
-            user_id=user_id,
-            friend_id=request.friend_id,
+            user_id=request.friend_id,
+            friend_id=user_id,
             status=0
         )
         response = crud_friend.create(db=db, obj_in=friend)
