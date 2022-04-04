@@ -21,5 +21,9 @@ class CRUDUser(CRUDBase[UserDetail, UserDetail, UserDetail]):
             order_by(text(f"updated_at desc")).all()
         return friends
 
+    def get_all_users(self, db: Session):
+        users = db.query(self.model).order_by(text(f"created_at asc")).all()
+        return users
+
 
 crud_user = CRUDUser(User)

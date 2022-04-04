@@ -87,3 +87,27 @@ class UserService:
             raise ValidateException(error_code.ERROR_004_PASSWORD_IS_WRONG, message.MESSAGE_004_PASSWORD_IS_WRONG)
         crud_user.update(db=db, db_obj=user_detail, obj_in={'password': get_password_hash(update_password)})
         return
+
+    @staticmethod
+    def get_list_users(db=None, queryParams: str = None, page: int = None, page_size: int = None, user_id: int = None):
+        users = crud_user.get_all_users(db=db)
+
+        response = []
+        for user in users:
+            full_name = str(user.last_name + user.first_name)
+            if user.id == user_id:
+                continue
+            if queryParams is None or queryParams.lower() in full_name.lower() \
+                    or queryParams in str(user.email).lower() or queryParams in str(user.username).lower():
+                response.append(user)
+
+        start_idx = (page - 1) * page_size
+        end_idx = min(page * page_size, len(response))
+        return {
+            'items': response[start_idx:end_idx],
+            'pagination': {
+                'current_page': page,
+                'page_size': page_size,
+                'total_items': len(response)
+            }
+        }
