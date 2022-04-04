@@ -1,3 +1,5 @@
+from typing import Optional
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
@@ -6,7 +8,7 @@ from app.helpers.login_manager import login_required
 from app.helpers.paging import PaginationParamsRequest
 from app.schemas.sche_base import DataResponse
 from app.schemas.sche_friend import FriendRequest, ListFriendRequest, ApproveFriendRequest
-from app.schemas.sche_user import UserDetail
+from app.schemas.sche_user import UserDetail, ListUser
 from app.services.srv_friend import FriendService
 
 router = APIRouter()
@@ -35,9 +37,9 @@ def get_list_friend_requests(current_user: UserDetail = Depends(login_required),
     return DataResponse().success_response(data=response)
 
 
-@router.get('')
-def get_list_friends(current_user: UserDetail = Depends(login_required),
+@router.get('', response_model=DataResponse[ListUser])
+def get_list_friends(current_user: UserDetail = Depends(login_required), queryParams: Optional[str] = None,
                      pagination: PaginationParamsRequest = Depends(), db: Session = Depends(deps.get_db)):
-    response = FriendService.get_list_friends(db=db, user_id=current_user.id,
+    response = FriendService.get_list_friends(db=db, user_id=current_user.id, queryParams=queryParams,
                                               page=pagination.page, page_size=pagination.page_size)
     return DataResponse().success_response(data=response)

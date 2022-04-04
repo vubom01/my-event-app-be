@@ -26,16 +26,8 @@ class CRUDFriend(CRUDBase[FriendRequestDetail, FriendRequestDetail, FriendReques
         resp = self.update(db=db, db_obj=friend_request, obj_in={'status': 1})
         return resp
 
-    def get_list_friends(self, db: Session, page: int, page_size: int, user_id: int):
-        query = db.query(self.model).filter(self.model.user_id == user_id, self.model.status == 1)
-        print(query)
-        pagination = PaginationParams(
-            page=page,
-            page_size=page_size,
-            sort_by='updated_at'
-        )
-        resp = self.paginate(query=query, params=pagination)
-        return resp
+    def get_all_friends(self, db: Session, user_id: int):
+        return db.query(self.model).filter(self.model.user_id == user_id, self.model.status == 1)
 
 
 crud_friend = CRUDFriend(Friend)

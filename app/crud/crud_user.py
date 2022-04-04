@@ -1,3 +1,7 @@
+from typing import List
+
+from sqlalchemy import text
+
 from app.crud.crud_base import CRUDBase
 from app.schemas.sche_user import UserDetail
 from sqlalchemy.orm import Session
@@ -11,6 +15,11 @@ class CRUDUser(CRUDBase[UserDetail, UserDetail, UserDetail]):
             return db.query(self.model).filter(self.model.username == username).first()
         if email:
             return db.query(self.model).filter(self.model.email == email).first()
+
+    def get_list_user(self, db: Session, user_id: List[str]):
+        friends = db.query(self.model).filter(self.model.id.in_(user_id)).\
+            order_by(text(f"updated_at desc")).all()
+        return friends
 
 
 crud_user = CRUDUser(User)

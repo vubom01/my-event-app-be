@@ -57,6 +57,27 @@ class FriendService:
         return resp
 
     @staticmethod
-    def get_list_friends(db=None, user_id: int = None, page: int = None, page_size: int = None):
-        resp = crud_friend.get_list_friends(db=db, page=page, page_size=page_size, user_id=user_id)
-        return resp
+    def get_list_friends(db=None, user_id: int = None, page: int = None, page_size: int = None,
+                         queryParams: str = None):
+        friends = crud_friend.get_all_friends(db=db, user_id=user_id)
+        friend_id = []
+        for friend in friends:
+            friend_id.append(friend.friend_id)
+        list_friends = crud_user.get_list_user(db=db, user_id=friend_id)
+        response = []
+        for friend in list_friends:
+            full_name = str(friend.last_name + friend.first_name)
+            if queryParams is None or queryParams.lower() in full_name.lower() \
+                    or queryParams in str(friend.email).lower() or queryParams in str(friend.username).lower():
+                response.append(friend)
+
+        start_idx = (page - 1) * page_size
+        end_idx = min(page * page_size, len(response))
+        return {
+            'items': response[start_idx:end_idx],
+            'pagination': {
+                'current_page': page,
+                'page_size': page_size,
+                'total_items': len(response)
+            }
+        }

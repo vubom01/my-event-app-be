@@ -1,6 +1,7 @@
 from datetime import date
 from typing import Optional, List
 
+from app.helpers.paging import PaginationParamsResponse
 from app.schemas.sche_base import ItemBaseModel
 
 
@@ -30,4 +31,7 @@ class UserUpdateRequest(ItemBaseModel):
     avatar: Optional[str]
 
 
+class ListUser(ItemBaseModel):
+    items: List[UserDetail]
+    pagination: PaginationParamsResponse
 
