@@ -4,6 +4,7 @@ from typing import List
 from app.crud.crud_event import crud_event
 from app.crud.crud_event_image import crud_event_image
 from app.crud.crud_like_event import crud_like_event
+from app.crud.crud_user import crud_user
 from app.crud.crud_user_event_status import crud_user_event_status
 from app.helpers.paging import PaginationParamsRequest
 from app.models.like_event_model import LikeEvent
@@ -121,6 +122,49 @@ class EventService(object):
                 user_id=user_id
             )
             crud_user_event_status.create(db=db, obj_in=user_event_status)
+
+    def approve_event_request(self, db, event_id: int, user_id: int, approve: str):
+        self.check_exist_event(db=db, event_id=event_id)
+
+        user_event_status = crud_user_event_status.get_user_event_status(db=db, event_id=event_id, user_id=user_id)
+        if user_event_status is None:
+            raise CustomException(http_code=400, message='Request has not sent')
+        else:
+            if user_event_status.status == 1:
+                raise CustomException(http_code=400, message='User attended the event')
+            if approve == 'approved':
+                crud_user_event_status.update(db=db, db_obj=user_event_status, obj_in={'status': 1})
+            else:
+                crud_user_event_status.remove(db=db, id=user_event_status.id)
+
+    @staticmethod
+    def get_event_requests_of_event(db, event_id: int, query_params: str,
+                                    page: int, page_size: int, host_id: str, status: int):
+        event_detail = crud_event.get(db=db, id=event_id)
+        if event_detail.host_id != host_id:
+            raise CustomException(http_code=400, message='User cannot this access')
+
+        user_event_status = crud_user_event_status.get_event_requests_by_event_id(db=db, event_id=event_id,
+                                                                                  status=status)
+        user_ids = [user_event.user_id for user_event in user_event_status]
+        users = crud_user.get_list_user(db=db, user_id=user_ids)
+        response = []
+        for user in users:
+            full_name = str(user.last_name + user.first_name)
+            if query_params is None or query_params.lower() in full_name.lower() \
+                    or query_params in str(user.email).lower() or query_params in str(user.username).lower():
+                response.append(user)
+
+        start_idx = (page - 1) * page_size
+        end_idx = min(page * page_size, len(response))
+        return {
+            'items': response[start_idx:end_idx],
+            'pagination': {
+                'current_page': page,
+                'page_size': page_size,
+                'total_items': len(response)
+            }
+        }
 
 
 event_srv = EventService()

@@ -39,8 +39,8 @@ def update_password(current_user: UserDetail = Depends(login_required),
 
 
 @router.get('', dependencies=[Depends(login_required)], response_model=DataResponse[ListUser])
-def get_list_users(db: Session = Depends(deps.get_db), queryParams: Optional[str] = None,
+def get_list_users(db: Session = Depends(deps.get_db), query_params: Optional[str] = None,
                    pagination: PaginationParamsRequest = Depends(), current_user: UserDetail = Depends(login_required)):
-    users = UserService.get_list_users(db=db, queryParams=queryParams, user_id=current_user.id,
+    users = UserService.get_list_users(db=db, query_params=query_params, user_id=current_user.id,
                                        page=pagination.page, page_size=pagination.page_size)
     return DataResponse().success_response(data=users)

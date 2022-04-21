@@ -89,7 +89,7 @@ class UserService:
         return
 
     @staticmethod
-    def get_list_users(db=None, queryParams: str = None, page: int = None, page_size: int = None, user_id: int = None):
+    def get_list_users(db=None, query_params: str = None, page: int = None, page_size: int = None, user_id: int = None):
         users = crud_user.get_all_users(db=db)
 
         response = []
@@ -97,8 +97,8 @@ class UserService:
             full_name = str(user.last_name + user.first_name)
             if user.id == user_id:
                 continue
-            if queryParams is None or queryParams.lower() in full_name.lower() \
-                    or queryParams in str(user.email).lower() or queryParams in str(user.username).lower():
+            if query_params is None or query_params.lower() in full_name.lower() \
+                    or query_params in str(user.email).lower() or query_params in str(user.username).lower():
                 response.append(user)
 
         start_idx = (page - 1) * page_size

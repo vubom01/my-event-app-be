@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional, List
 
-from app.helpers.enums import SearchEventType
+from app.helpers.enums import SearchEventType, ApproveEventStatus
 from app.schemas.sche_base import ItemBaseModel
 
 
@@ -42,3 +42,7 @@ class EventsResponse(ItemBaseModel):
 
 class EventRequest(ItemBaseModel):
     user_id: str
+
+
+class ApproveEventRequest(ItemBaseModel):
+    approve: ApproveEventStatus
