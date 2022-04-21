@@ -15,6 +15,9 @@ class CRUDUserEventStatus(CRUDBase[UserEventStatusDetail, UserEventStatusDetail,
     def get_event_requests_by_event_id(self, db: Session, event_id: int, status: int):
         return db.query(self.model).filter(self.model.event_id == event_id, self.model.status == status).all()
 
+    def get_event_join(self, db: Session, user_id: str):
+        return db.query(self.model).filter(self.model.user_id == user_id, self.model.status == 1).all()
+
 
 crud_user_event_status = CRUDUserEventStatus(UserEventStatus)
 

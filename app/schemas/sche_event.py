@@ -38,7 +38,8 @@ class EventsRequest(ItemBaseModel):
 
 
 class EventsResponse(ItemBaseModel):
-    events: List[EventDetailResponse]
+    items: List[EventDetailResponse]
+    pagination: PaginationParamsResponse
 
 
 class EventRequest(ItemBaseModel):

@@ -28,7 +28,7 @@ def create(current_user: UserDetail = Depends(login_required), request: EventCre
 @router.get('', dependencies=[Depends(login_required)], response_model=DataResponse[EventsResponse])
 def get_events(req_data: EventsRequest = Depends(), pagination: PaginationParamsRequest = Depends(),
                current_user: UserDetail = Depends(login_required), db: Session = Depends(deps.get_db)):
-    events = event_srv.search_event(db=db, req_data=req_data, pagination=pagination, user_id=current_user.id)
+    events = event_srv.get_events(db=db, req_data=req_data, pagination=pagination, user_id=current_user.id)
     return DataResponse().success_response(data=events)
 
 

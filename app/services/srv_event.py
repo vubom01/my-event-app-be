@@ -237,5 +237,61 @@ class EventService(object):
 
         crud_user_event_status.remove(db=db, id=user_event_status.id)
 
+    def get_events(self, db, req_data: EventsRequest, pagination: PaginationParamsRequest, user_id: str):
+        events = []
+        if req_data.type is None:
+            list_event = crud_event.get_all_events(db=db)
+            for event in list_event:
+                if self.check_user_in_event(db=db, event_id=event.id, user_id=user_id) is True:
+                    events.append(event)
+        elif req_data.type.value == 'host':
+            events = crud_event.get_events_by_host_id(db=db, user_id=user_id)
+        elif req_data.type.value == 'join':
+            user_events = crud_user_event_status.get_event_join(db=db, user_id=user_id)
+            events = crud_event.get_events(db=db, event_ids=[user_event.event_id for user_event in user_events])
+        elif req_data.type.value == 'like':
+            like_events = crud_like_event.get_like_event_by_user_id(db=db, user_id=user_id)
+            events = crud_event.get_events(db=db, event_ids=[like_event.event_id for like_event in like_events])
+
+        response = []
+        for event in events:
+            check = True
+            host_detail = crud_user.get(db=db, id=event.host_id)
+            if req_data.host_info:
+                query_params = str(req_data.host_info)
+                full_name = str(host_detail.last_name + host_detail.first_name)
+                if query_params.lower() in full_name.lower() \
+                        or query_params in str(host_detail.email).lower() \
+                        or query_params in str(host_detail.username).lower():
+                    pass
+                else:
+                    check = False
+            if req_data.event_name:
+                if str(req_data.event_name).lower() not in str(event.event_name).lower():
+                    check = False
+            if req_data.topic:
+                if str(req_data.topic) not in str(event.topic):
+                    check = False
+            if req_data.start_at:
+                if str(req_data.start_at) > str(event.start_at):
+                    check = False
+            if req_data.end_at:
+                if str(req_data.end_at) < str(event.end_at):
+                    check = False
+
+            if check is True:
+                response.append(event)
+
+        start_idx = (pagination.page - 1) * pagination.page_size
+        end_idx = min(pagination.page * pagination.page_size, len(response))
+        return {
+            'items': response[start_idx:end_idx],
+            'pagination': {
+                'current_page': pagination.page,
+                'page_size': pagination.page_size,
+                'total_items': len(response)
+            }
+        }
+
 
 event_srv = EventService()
