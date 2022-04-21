@@ -83,6 +83,20 @@ def delete_user_event(event_id: int, req_data: EventRequest,
     return DataResponse().success_response(data=response)
 
 
+@router.post('/{event_id}/join', dependencies=[Depends(login_required)])
+def join_public_event(event_id: int, current_user: UserDetail = Depends(login_required),
+                      db: Session = Depends(deps.get_db)):
+    response = event_srv.join_public_event(db=db, event_id=event_id, user_id=current_user.id)
+    return DataResponse().success_response(data=response)
+
+
+@router.delete('/{event_id}/join', dependencies=[Depends(login_required)])
+def out_event(event_id: int, current_user: UserDetail = Depends(login_required),
+              db: Session = Depends(deps.get_db)):
+    response = event_srv.out_event(db=db, event_id=event_id, user_id=current_user.id)
+    return DataResponse().success_response(data=response)
+
+
 @router.get('/{event_id}/requests', dependencies=[Depends(login_required)], response_model=DataResponse[ListUser])
 def get_event_requests_of_event(event_id: int, status: StatusEventRequest, query_params: Optional[str] = None,
                                 pagination: PaginationParamsRequest = Depends(), db: Session = Depends(deps.get_db),

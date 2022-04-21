@@ -207,5 +207,35 @@ class EventService(object):
             }
         }
 
+    @staticmethod
+    def join_public_event(db, event_id: int, user_id: str):
+        event_detail = crud_event.get(db=db, id=event_id)
+        if event_detail is None:
+            raise CustomException(http_code=400, message='Event is not exist')
+        if event_detail.host_id == user_id:
+            raise CustomException(http_code=400, message='User is host of event')
+        if event_detail.status == 0:
+            raise CustomException(http_code=400, message='Event is private')
+
+        user_event_status = crud_user_event_status.get_user_event_status(db=db, event_id=event_id, user_id=user_id)
+        if user_event_status:
+            raise CustomException(http_code=400, message='Người dùng đã được mời hoặc đã tham gia sự kiện')
+
+        user_event = UserEventStatus(
+            event_id=event_id,
+            user_id=user_id,
+            status=1
+        )
+        crud_user_event_status.create(db=db, obj_in=user_event)
+
+    def out_event(self, db, event_id: int, user_id: str):
+        self.check_exist_event(db=db, event_id=event_id)
+
+        user_event_status = crud_user_event_status.get_user_event_status(db=db, event_id=event_id, user_id=user_id)
+        if user_event_status is None or user_event_status.status == 0:
+            raise CustomException(http_code=400, message='Người dùng chưa tham gia sự kiện')
+
+        crud_user_event_status.remove(db=db, id=user_event_status.id)
+
 
 event_srv = EventService()
