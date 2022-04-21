@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
 from app.api import deps
+from app.helpers.enums import ApproveEventStatus
 from app.helpers.login_manager import login_required
 from app.schemas.sche_base import DataResponse, ItemBaseModel
 from app.schemas.sche_event import EventCreateRequest, EventDetailResponse
@@ -38,4 +39,12 @@ def send_event_request(event_id: int, user_id: str, current_user: UserDetail = D
 def delete_user_event(event_id: int, user_id: str, current_user: UserDetail = Depends(login_required),
                       db: Session = Depends(deps.get_db)):
     event_request = event_srv.delete_user_event(db=db, event_id=event_id, user_id=user_id, host_id=current_user.id)
+    return DataResponse().success_response(data=event_request)
+
+
+@router.put('/{event_id}/invite', dependencies=[Depends(login_required)])
+def approve_event_request(event_id: int, approve: ApproveEventStatus, db: Session = Depends(deps.get_db),
+                          current_user: UserDetail = Depends(login_required)):
+    event_request = event_srv.approve_event_request(db=db, event_id=event_id, user_id=current_user.id,
+                                                    approve=approve.value)
     return DataResponse().success_response(data=event_request)

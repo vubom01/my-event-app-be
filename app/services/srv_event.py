@@ -89,5 +89,20 @@ class EventService(object):
         else:
             raise CustomException(http_code=400, message='User is not invited to the event')
 
+    @staticmethod
+    def approve_event_request(db=None, event_id: int = None, user_id: str = None, approve: str = None):
+        user_event_status = crud_user_event_status.get_user_event_status(db=db, event_id=event_id, user_id=user_id)
+        if user_event_status is None:
+            raise CustomException(http_code=400, message='User is not invited to the event')
+        else:
+            if approve == 'approved':
+                if user_event_status.status == 2:
+                    raise CustomException(http_code=400, message='User is approved event request')
+                crud_user_event_status.update(db=db, db_obj=user_event_status, obj_in={'status': 2})
+            if approve == 'rejected':
+                if user_event_status.status == 1:
+                    raise CustomException(http_code=400, message='User is rejected event request')
+                crud_user_event_status.update(db=db, db_obj=user_event_status, obj_in={'status': 1})
+
 
 event_srv = EventService()
