@@ -27,4 +27,15 @@ def get_detail(current_user: UserDetail = Depends(login_required), event_id: int
     return DataResponse().success_response(data=event)
 
 
-# @router.post('/{event_id}/invite', dependencies=[Depends(login_required())])
+@router.post('/{event_id}/invite', dependencies=[Depends(login_required)])
+def send_event_request(event_id: int, user_id: str, current_user: UserDetail = Depends(login_required),
+                       db: Session = Depends(deps.get_db)):
+    event_request = event_srv.send_event_request(db=db, event_id=event_id, user_id=user_id, host_id=current_user.id)
+    return DataResponse().success_response(data=event_request)
+
+
+# @router.delete('/{event_id}/invite', dependencies=[Depends(login_required)])
+# def delete_user_event(event_id: int, user_id: str, current_user: UserDetail = Depends(login_required),
+#                       db: Session = Depends(deps.get_db)):
+#     event_request = event_srv.send_event_request(db=db, event_id=event_id, user_id=user_id, host_id=current_user.id)
+#     return DataResponse().success_response(data=event_request)

@@ -4,6 +4,7 @@ from typing import List
 from app.crud.crud_event import crud_event
 from app.crud.crud_event_image import crud_event_image
 from app.crud.crud_user_event_status import crud_user_event_status
+from app.models.user_event_status_model import UserEventStatus
 from app.schemas.sche_event import EventCreateRequest, EventDetail
 from app.schemas.sche_event_image import EventImageDetail
 from app.helpers.exception_handler import CustomException
@@ -56,8 +57,25 @@ class EventService(object):
             else:
                 raise CustomException(http_code=400, message='User is not invited to the event')
 
-    # @staticmethod
-    # def send_event_request(db=None, event_id: int = None, user_id: str = None):
+    @staticmethod
+    def send_event_request(db=None, event_id: int = None, user_id: str = None, host_id: str = None):
+        event_detail = crud_event.get(db=db, id=event_id)
+        if event_detail.host_id != host_id:
+            raise CustomException(http_code=400, message='User is not host')
+
+        user_event_status = crud_user_event_status.get_user_event_status(db=db, event_id=event_id, user_id=user_id)
+        if user_event_status is not None:
+            if user_event_status.status == 0:
+                raise CustomException(http_code=400, message='Request has sent')
+            if user_event_status.status == 2:
+                raise CustomException(http_code=400, message='User attended the event')
+            crud_user_event_status.update(db=db, db_obj=user_event_status, obj_in={'status': 0})
+        else:
+            user_event_status = UserEventStatus(
+                event_id=event_id,
+                user_id=user_id
+            )
+            crud_user_event_status.create(db=db, obj_in=user_event_status)
 
 
 event_srv = EventService()
