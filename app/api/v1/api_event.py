@@ -83,3 +83,9 @@ def like_event(event_id: int, current_user: UserDetail = Depends(login_required)
 def join_event(event_id: int, current_user: UserDetail = Depends(login_required), db: Session = Depends(deps.get_db)):
     response = event_srv.join_event(db=db, event_id=event_id, user_id=current_user.id)
     return DataResponse().success_response(data=response)
+
+
+@router.delete('/{event_id}/join', dependencies=[Depends(login_required)])
+def out_event(event_id: int, current_user: UserDetail = Depends(login_required), db: Session = Depends(deps.get_db)):
+    response = event_srv.out_event(db=db, event_id=event_id, user_id=current_user.id)
+    return DataResponse().success_response(data=response)

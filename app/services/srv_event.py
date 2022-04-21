@@ -167,6 +167,14 @@ class EventService(object):
         else:
             raise CustomException(http_code=400, message='Event is private')
 
+    @staticmethod
+    def out_event(db=None, event_id: int = None, user_id: str = None):
+        user_event_status = crud_user_event_status.get_user_event_status(db=db, event_id=event_id, user_id=user_id)
+        if user_event_status is None or user_event_status.status != 2:
+            raise CustomException(http_code=400, message='User has not joined this event')
+        else:
+            crud_user_event_status.remove(db=db, id=user_event_status.id)
+
 
     # def search_event(self, db, req_data: EventsRequest, pagination: PaginationParamsRequest, user_id: str):
     #     events = []
