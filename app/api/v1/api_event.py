@@ -57,8 +57,8 @@ def unlike_event(event_id: int, current_user: UserDetail = Depends(login_require
 
 
 @router.post('/{event_id}/invite', dependencies=[Depends(login_required)])
-def send_event_request(req_data: EventRequest, current_user: UserDetail = Depends(login_required),
+def send_event_request(event_id: int, req_data: EventRequest, current_user: UserDetail = Depends(login_required),
                        db: Session = Depends(deps.get_db)):
-    response = event_srv.send_event_request(db=db, event_id=req_data.event_id, user_id=req_data.user_id,
+    response = event_srv.send_event_request(db=db, event_id=event_id, user_id=req_data.user_id,
                                             host_id=current_user.id)
     return DataResponse().success_response(data=response)

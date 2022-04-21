@@ -41,5 +41,4 @@ class EventsResponse(ItemBaseModel):
 
 
 class EventRequest(ItemBaseModel):
-    event_id: int
     user_id: str
