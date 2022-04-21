@@ -18,3 +18,8 @@ class EventDetail(ItemBaseModel):
 
 class EventCreateRequest(EventDetail):
     images: Optional[List[str]]
+
+
+class EventDetailResponse(EventDetail):
+    id: int
+    images: Optional[List[str]]

@@ -11,7 +11,7 @@ from app.helpers.exception_handler import CustomException
 logger = logging.getLogger()
 
 
-class EventService:
+class EventService(object):
 
     @staticmethod
     def create_event(db=None, event: EventCreateRequest = None, user_id: str = None):
@@ -33,18 +33,31 @@ class EventService:
         }
 
     @staticmethod
-    def get_detail(db=None, event_id: int = None, user_id: str = None):
+    def get_event_images(db, event_id: int):
+        event_images = crud_event_image.get_event_images(db=db, event_id=event_id)
+        response = []
+        for event_image in event_images:
+            response.append(event_image.image)
+        return response
+
+    def get_detail(self, db, event_id: int, user_id: str):
         event = crud_event.get(db=db, id=event_id)
+        images = self.get_event_images(db=db, event_id=event_id)
         if event is None:
             raise CustomException(http_code=400, message='Event is not exist')
         if event.status == 1 or event.host_id == user_id:
+            event.images = images
             return event
         else:
             user_event_status = crud_user_event_status.get_user_event_status(db=db, event_id=event_id, user_id=user_id)
             if user_event_status is not None and user_event_status.status == 2:
+                event.images = images
                 return event
             else:
                 raise CustomException(http_code=400, message='User is not invited to the event')
 
-                
-        
+    # @staticmethod
+    # def send_event_request(db=None, event_id: int = None, user_id: str = None):
+
+
+event_srv = EventService()
