@@ -13,16 +13,14 @@ from app.services.srv_event import EventService
 router = APIRouter()
 
 
-class UpdatePassword(ItemBaseModel):
-    current_password: str
-    update_password: str
-
-
 @router.post('', dependencies=[Depends(login_required)])
-def detail(current_user: UserDetail = Depends(login_required), request: EventCreateRequest = None,
+def create(current_user: UserDetail = Depends(login_required), request: EventCreateRequest = None,
            db: Session = Depends(deps.get_db)):
     event = EventService.create_event(db=db, event=request, user_id=current_user.id)
     return DataResponse().success_response(data=event)
 
 
-
+@router.get('/{event_id}', dependencies=[Depends(login_required)])
+def get_detail(current_user: UserDetail = Depends(login_required), event_id: int = None,
+               db: Session = Depends(deps.get_db)):
+    event = E
