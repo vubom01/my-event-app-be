@@ -75,6 +75,14 @@ def approve_event_request(event_id: int, req_data: ApproveEventRequest,
     return DataResponse().success_response(data=response)
 
 
+@router.delete('/{event_id}/invite', dependencies=[Depends(login_required)])
+def delete_user_event(event_id: int, req_data: EventRequest,
+                      current_user: UserDetail = Depends(login_required), db: Session = Depends(deps.get_db)):
+    response = event_srv.delete_user_event(db=db, event_id=event_id, user_id=req_data.user_id,
+                                           host_id=current_user.id)
+    return DataResponse().success_response(data=response)
+
+
 @router.get('/{event_id}/requests', dependencies=[Depends(login_required)], response_model=DataResponse[ListUser])
 def get_event_requests_of_event(event_id: int, status: StatusEventRequest, query_params: Optional[str] = None,
                                 pagination: PaginationParamsRequest = Depends(), db: Session = Depends(deps.get_db),

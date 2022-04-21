@@ -133,6 +133,8 @@ class EventService(object):
     @staticmethod
     def send_event_request(db=None, event_id: int = None, user_id: int = None, host_id: int = None):
         event_detail = crud_event.get(db=db, id=event_id)
+        if event_detail is None:
+            raise CustomException(http_code=400, message='Event is not exist')
         if event_detail.host_id != host_id:
             raise CustomException(http_code=400, message='User cannot this access')
 
@@ -162,6 +164,19 @@ class EventService(object):
                 crud_user_event_status.update(db=db, db_obj=user_event_status, obj_in={'status': 1})
             else:
                 crud_user_event_status.remove(db=db, id=user_event_status.id)
+
+    @staticmethod
+    def delete_user_event(db, event_id: int, user_id: int, host_id: int):
+        event_detail = crud_event.get(db=db, id=event_id)
+        if event_detail is None:
+            raise CustomException(http_code=400, message='Event is not exist')
+        if event_detail.host_id != host_id:
+            raise CustomException(http_code=400, message='User cannot this access')
+
+        user_event_status = crud_user_event_status.get_user_event_status(db=db, event_id=event_id, user_id=user_id)
+        if user_event_status is None:
+            raise CustomException(http_code=400, message='Người dùng chưa được mời hoặc chưa tham gia sự kiện')
+        crud_user_event_status.remove(db=db, id=user_event_status.id)
 
     @staticmethod
     def get_event_requests_of_event(db, event_id: int, query_params: str,
