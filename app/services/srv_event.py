@@ -177,6 +177,10 @@ class EventService(object):
         if user_event_status is None:
             raise CustomException(http_code=400, message='Người dùng chưa được mời hoặc chưa tham gia sự kiện')
         crud_user_event_status.remove(db=db, id=user_event_status.id)
+        if event_detail.status == 0:
+            like_event = crud_like_event.get_like_event(db=db, event_id=event_id, user_id=user_id)
+            if like_event:
+                crud_like_event.remove(db=db, id=like_event.id)
 
     @staticmethod
     def get_event_requests_of_event(db, event_id: int, query_params: str,
@@ -228,14 +232,22 @@ class EventService(object):
         )
         crud_user_event_status.create(db=db, obj_in=user_event)
 
-    def out_event(self, db, event_id: int, user_id: str):
-        self.check_exist_event(db=db, event_id=event_id)
+    @staticmethod
+    def out_event(db, event_id: int, user_id: str):
+        event = crud_event.get(db=db, id=event_id)
+        if event is None:
+            raise CustomException(http_code=400, message='Event is not exist')
 
         user_event_status = crud_user_event_status.get_user_event_status(db=db, event_id=event_id, user_id=user_id)
         if user_event_status is None or user_event_status.status == 0:
             raise CustomException(http_code=400, message='Người dùng chưa tham gia sự kiện')
 
         crud_user_event_status.remove(db=db, id=user_event_status.id)
+
+        if event.status == 0:
+            like_event = crud_like_event.get_like_event(db=db, event_id=event_id, user_id=user_id)
+            if like_event:
+                crud_like_event.remove(db=db, id=like_event.id)
 
     def get_events(self, db, req_data: EventsRequest, pagination: PaginationParamsRequest, user_id: str):
         events = []
