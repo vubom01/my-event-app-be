@@ -34,3 +34,7 @@ class EventsRequest(ItemBaseModel):
     start_at: Optional[datetime]
     end_at: Optional[datetime]
     status: Optional[int]
+
+
+class EventsResponse(ItemBaseModel):
+    events: List[EventDetailResponse]

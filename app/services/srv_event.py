@@ -5,9 +5,10 @@ from app.crud.crud_event import crud_event
 from app.crud.crud_event_image import crud_event_image
 from app.crud.crud_like_event import crud_like_event
 from app.crud.crud_user_event_status import crud_user_event_status
+from app.helpers.paging import PaginationParamsRequest
 from app.models.like_event_model import LikeEvent
 from app.models.user_event_status_model import UserEventStatus
-from app.schemas.sche_event import EventCreateRequest, EventDetail
+from app.schemas.sche_event import EventCreateRequest, EventDetail, EventsRequest
 from app.schemas.sche_event_image import EventImageDetail
 from app.helpers.exception_handler import CustomException
 
@@ -149,6 +150,42 @@ class EventService(object):
             return True
 
         return False
+
+    @staticmethod
+    def join_event(db=None, event_id: int = None, user_id: str = None):
+        event_detail = crud_event.get(db=db, id=event_id)
+        if event_detail.status == 1:
+            user_event_status = crud_user_event_status.get_user_event_status(db=db, event_id=event_id, user_id=user_id)
+            if user_event_status:
+                raise CustomException(http_code=400, message='User has join this event')
+            user_event_status = UserEventStatus(
+                event_id=event_id,
+                user_id=user_id,
+                status=2
+            )
+            crud_user_event_status.create(db=db, obj_in=user_event_status)
+        else:
+            raise CustomException(http_code=400, message='Event is private')
+
+
+    # def search_event(self, db, req_data: EventsRequest, pagination: PaginationParamsRequest, user_id: str):
+    #     events = []
+    #     if req_data.type is None:
+    #         events = crud_event.get_all_events(db=db)
+    #     elif req_data.type.value == 'host':
+    #         events = crud_event.get_events_by_host_id(db=db, user_id=user_id)
+    #     elif req_data.type.value == 'join':
+    #
+    #     response = []
+    #     for event in events:
+    #         if self.check_user_in_event(db=db, event_id=event.id, user_id=user_id):
+    #             response.append(event)
+    #
+    #     for event in response:
+    #         event.images = self.get_event_images(db=db, event_id=event.id)
+    #     return {
+    #         'events': response
+    #     }
 
 
 event_srv = EventService()

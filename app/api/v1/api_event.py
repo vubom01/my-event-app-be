@@ -9,7 +9,7 @@ from app.helpers.login_manager import login_required
 from app.helpers.paging import PaginationParamsRequest
 from app.models.user_event_status_model import UserEventStatus
 from app.schemas.sche_base import DataResponse, ItemBaseModel
-from app.schemas.sche_event import EventCreateRequest, EventDetailResponse, EventsRequest
+from app.schemas.sche_event import EventCreateRequest, EventDetailResponse, EventsRequest, EventsResponse
 from app.schemas.sche_user import UserDetail
 from app.schemas.sche_user_event_status import ListUserEventStatus
 from app.services.srv_event import event_srv
@@ -24,10 +24,11 @@ def create(current_user: UserDetail = Depends(login_required), request: EventCre
     return DataResponse().success_response(data=event)
 
 
-@router.get('', dependencies=[Depends(login_required)])
+@router.get('', dependencies=[Depends(login_required)], response_model=DataResponse[EventsResponse])
 def get_events(req_data: EventsRequest = Depends(), pagination: PaginationParamsRequest = Depends(),
-               current_user: UserDetail = Depends(login_required)):
-    pass
+               current_user: UserDetail = Depends(login_required), db: Session = Depends(deps.get_db)):
+    events = event_srv.search_event(db=db, req_data=req_data, pagination=pagination, user_id=current_user.id)
+    return DataResponse().success_response(data=events)
 
 
 @router.get('/request',  dependencies=[Depends(login_required)], response_model=DataResponse[ListUserEventStatus])
@@ -75,4 +76,10 @@ def like_event(event_id: int, current_user: UserDetail = Depends(login_required)
 @router.delete('/{event_id}/like', dependencies=[Depends(login_required)])
 def like_event(event_id: int, current_user: UserDetail = Depends(login_required), db: Session = Depends(deps.get_db)):
     response = event_srv.unlike_event(db=db, event_id=event_id, user_id=current_user.id)
+    return DataResponse().success_response(data=response)
+
+
+@router.post('/{event_id}/join', dependencies=[Depends(login_required)])
+def join_event(event_id: int, current_user: UserDetail = Depends(login_required), db: Session = Depends(deps.get_db)):
+    response = event_srv.join_event(db=db, event_id=event_id, user_id=current_user.id)
     return DataResponse().success_response(data=response)
