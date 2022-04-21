@@ -1,3 +1,5 @@
+from typing import List
+
 from app.schemas.sche_base import ItemBaseModel
 
 
@@ -10,3 +12,7 @@ class UserEventStatus(ItemBaseModel):
 
 class UserEventStatusDetail(UserEventStatus):
     id: int
+
+
+class ListUserEventStatus(ItemBaseModel):
+    event_requests: List[UserEventStatus]

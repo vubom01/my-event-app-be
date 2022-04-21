@@ -104,5 +104,11 @@ class EventService(object):
                     raise CustomException(http_code=400, message='User is rejected event request')
                 crud_user_event_status.update(db=db, db_obj=user_event_status, obj_in={'status': 1})
 
+    @staticmethod
+    def get_event_requests(db=None, status=None, user_id: str = None):
+        return {
+            'event_requests': crud_user_event_status.get_event_requests(db=db, status=status, user_id=user_id)
+        }
+
 
 event_srv = EventService()

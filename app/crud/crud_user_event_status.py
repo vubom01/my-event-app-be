@@ -9,6 +9,12 @@ class CRUDUserEventStatus(CRUDBase[UserEventStatusDetail, UserEventStatusDetail,
     def get_user_event_status(self, db: Session, event_id: int, user_id: str):
         return db.query(self.model).filter(self.model.event_id == event_id, self.model.user_id == user_id).first()
 
+    def get_event_requests(self, db: Session, status, user_id: str):
+        if status is None:
+            return db.query(self.model).filter(self.model.user_id == user_id).all()
+        else:
+            return db.query(self.model).filter(self.model.user_id == user_id, self.model.status == status.value).all()
+
 
 crud_user_event_status = CRUDUserEventStatus(UserEventStatus)
 
