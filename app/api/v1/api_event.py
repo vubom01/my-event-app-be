@@ -6,9 +6,10 @@ from sqlalchemy.orm import Session
 from app.api import deps
 from app.helpers.enums import ApproveEventStatus, StatusEventRequest
 from app.helpers.login_manager import login_required
+from app.helpers.paging import PaginationParamsRequest
 from app.models.user_event_status_model import UserEventStatus
 from app.schemas.sche_base import DataResponse, ItemBaseModel
-from app.schemas.sche_event import EventCreateRequest, EventDetailResponse
+from app.schemas.sche_event import EventCreateRequest, EventDetailResponse, EventsRequest
 from app.schemas.sche_user import UserDetail
 from app.schemas.sche_user_event_status import ListUserEventStatus
 from app.services.srv_event import event_srv
@@ -21,6 +22,12 @@ def create(current_user: UserDetail = Depends(login_required), request: EventCre
            db: Session = Depends(deps.get_db)):
     event = event_srv.create_event(db=db, event=request, user_id=current_user.id)
     return DataResponse().success_response(data=event)
+
+
+@router.get('', dependencies=[Depends(login_required)])
+def get_events(req_data: EventsRequest = Depends(), pagination: PaginationParamsRequest = Depends(),
+               current_user: UserDetail = Depends(login_required)):
+    pass
 
 
 @router.get('/request',  dependencies=[Depends(login_required)], response_model=DataResponse[ListUserEventStatus])

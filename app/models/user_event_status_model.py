@@ -11,7 +11,6 @@ class UserEventStatus(BareBaseModel):
     event_id = Column(Integer, nullable=False)
     user_id = Column(String, nullable=False)
     status = Column(Integer, nullable=False, default=0)
-    like = Column(Integer, nullable=False, default=0)
 
     def public_info_to_client(self) -> dict:
         return {

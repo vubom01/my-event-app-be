@@ -23,3 +23,12 @@ class EventCreateRequest(EventDetail):
 class EventDetailResponse(EventDetail):
     id: int
     images: Optional[List[str]]
+
+
+class EventsRequest(ItemBaseModel):
+    host_info: Optional[str]
+    event_name: Optional[str]
+    topic: Optional[str]
+    start_at: Optional[datetime]
+    end_at: Optional[datetime]
+    status: Optional[int]
