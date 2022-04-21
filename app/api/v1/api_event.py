@@ -9,7 +9,7 @@ from app.helpers.login_manager import login_required
 from app.helpers.paging import PaginationParamsRequest
 from app.models.user_event_status_model import UserEventStatus
 from app.schemas.sche_base import DataResponse, ItemBaseModel
-from app.schemas.sche_event import EventCreateRequest, EventDetailResponse, EventsRequest, EventsResponse
+from app.schemas.sche_event import EventCreateRequest, EventDetailResponse, EventsRequest, EventsResponse, EventRequest
 from app.schemas.sche_user import UserDetail
 from app.schemas.sche_user_event_status import ListUserEventStatus
 from app.services.srv_event import event_srv
@@ -32,9 +32,8 @@ def get_events(req_data: EventsRequest = Depends(), pagination: PaginationParams
 
 
 @router.get('/request',  dependencies=[Depends(login_required)], response_model=DataResponse[ListUserEventStatus])
-def get_event_requests(status: Optional[StatusEventRequest] = None, db: Session = Depends(deps.get_db),
-                       current_user: UserDetail = Depends(login_required)):
-    event_requests = event_srv.get_event_requests(db=db, status=status, user_id=current_user.id)
+def get_event_requests(db: Session = Depends(deps.get_db), current_user: UserDetail = Depends(login_required)):
+    event_requests = event_srv.get_event_requests(db=db, user_id=current_user.id)
     return DataResponse().success_response(data=event_requests)
 
 
@@ -57,3 +56,9 @@ def unlike_event(event_id: int, current_user: UserDetail = Depends(login_require
     return DataResponse().success_response(data=response)
 
 
+@router.post('/{event_id}/invite', dependencies=[Depends(login_required)])
+def send_event_request(req_data: EventRequest, current_user: UserDetail = Depends(login_required),
+                       db: Session = Depends(deps.get_db)):
+    response = event_srv.send_event_request(db=db, event_id=req_data.event_id, user_id=req_data.user_id,
+                                            host_id=current_user.id)
+    return DataResponse().success_response(data=response)

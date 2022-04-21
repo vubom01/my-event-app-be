@@ -8,8 +8,7 @@ class ApproveEventStatus(Enum):
 
 class StatusEventRequest(Enum):
     INVITED = '0'
-    REJECTED = '1'
-    APPROVED = '2'
+    APPROVED = '1'
 
 
 class SearchEventType(Enum):

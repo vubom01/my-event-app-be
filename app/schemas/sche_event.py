@@ -38,3 +38,8 @@ class EventsRequest(ItemBaseModel):
 
 class EventsResponse(ItemBaseModel):
     events: List[EventDetailResponse]
+
+
+class EventRequest(ItemBaseModel):
+    event_id: int
+    user_id: str
