@@ -20,7 +20,7 @@ def create(current_user: UserDetail = Depends(login_required), request: EventCre
     return DataResponse().success_response(data=event)
 
 
-# @router.get('/{event_id}', dependencies=[Depends(login_required)])
-# def get_detail(current_user: UserDetail = Depends(login_required), event_id: int = None,
-#                db: Session = Depends(deps.get_db)):
-#                pass
+@router.get('/{event_id}', dependencies=[Depends(login_required)])
+def get_detail(current_user: UserDetail = Depends(login_required), event_id: int = None,
+               db: Session = Depends(deps.get_db)):
+    event = E
