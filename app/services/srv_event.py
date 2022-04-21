@@ -46,19 +46,13 @@ class EventService(object):
 
     def get_detail(self, db, event_id: int, user_id: str):
         event = crud_event.get(db=db, id=event_id)
-        images = self.get_event_images(db=db, event_id=event_id)
         if event is None:
             raise CustomException(http_code=400, message='Event is not exist')
-        if event.status == 1 or event.host_id == user_id:
+        if self.check_user_in_event(db=db, event_id=event_id, user_id=user_id):
+            images = self.get_event_images(db=db, event_id=event_id)
             event.images = images
             return event
-        else:
-            user_event_status = crud_user_event_status.get_user_event_status(db=db, event_id=event_id, user_id=user_id)
-            if user_event_status is not None and user_event_status.status == 2:
-                event.images = images
-                return event
-            else:
-                raise CustomException(http_code=400, message='User is not invited to the event')
+        raise CustomException(http_code=400, message='User cannot this access')
 
     @staticmethod
     def get_event_requests(db=None, status=None, user_id: str = None):
@@ -67,6 +61,7 @@ class EventService(object):
         }
 
     def like_event(self, db=None, event_id: int = None, user_id: str = None):
+        self.check_exist_event(db=db, event_id=event_id)
         like_event_detail = crud_like_event.get_like_event(db=db, event_id=event_id, user_id=user_id)
         if like_event_detail:
             raise CustomException(http_code=400, message='User has liked this event')
@@ -80,13 +75,33 @@ class EventService(object):
         else:
             raise CustomException(http_code=400, message='User cannot this access')
 
-    @staticmethod
-    def unlike_event(db=None, event_id: int = None, user_id: str = None):
+    def unlike_event(self, db=None, event_id: int = None, user_id: str = None):
+        self.check_exist_event(db=db, event_id=event_id)
         like_event_detail = crud_like_event.get_like_event(db=db, event_id=event_id, user_id=user_id)
         if like_event_detail is None:
             raise CustomException(http_code=400, message='User cannot this access')
         else:
             crud_like_event.remove(db=db, id=like_event_detail.id)
+
+    @staticmethod
+    def check_user_in_event(db=None, event_id: int = None, user_id: str = None):
+        event_detail = crud_event.get(db=db, id=event_id)
+        if event_detail.status == 1:
+            return True
+        if event_detail.host_id == user_id:
+            return True
+        user_event_status = crud_user_event_status.get_user_event_status(db=db, event_id=event_id, user_id=user_id)
+        if user_event_status is None:
+            return False
+        if user_event_status.status == 1:
+            return True
+        return False
+
+    @staticmethod
+    def check_exist_event(db=None, event_id: int = None):
+        event = crud_event.get(db=db, id=event_id)
+        if event is None:
+            raise CustomException(http_code=400, message='Event is not exist')
 
 
 event_srv = EventService()
