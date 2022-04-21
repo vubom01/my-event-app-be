@@ -61,53 +61,6 @@ class EventService(object):
                 raise CustomException(http_code=400, message='User is not invited to the event')
 
     @staticmethod
-    def send_event_request(db=None, event_id: int = None, user_id: str = None, host_id: str = None):
-        event_detail = crud_event.get(db=db, id=event_id)
-        if event_detail.host_id != host_id:
-            raise CustomException(http_code=400, message='User is not host')
-
-        user_event_status = crud_user_event_status.get_user_event_status(db=db, event_id=event_id, user_id=user_id)
-        if user_event_status is not None:
-            if user_event_status.status == 0:
-                raise CustomException(http_code=400, message='Request has sent')
-            if user_event_status.status == 2:
-                raise CustomException(http_code=400, message='User attended the event')
-            crud_user_event_status.update(db=db, db_obj=user_event_status, obj_in={'status': 0})
-        else:
-            user_event_status = UserEventStatus(
-                event_id=event_id,
-                user_id=user_id
-            )
-            crud_user_event_status.create(db=db, obj_in=user_event_status)
-
-    @staticmethod
-    def delete_user_event(db=None, event_id: int = None, user_id: str = None, host_id: str = None):
-        event_detail = crud_event.get(db=db, id=event_id)
-        if event_detail.host_id != host_id:
-            raise CustomException(http_code=400, message='User is not host')
-
-        user_event_status = crud_user_event_status.get_user_event_status(db=db, event_id=event_id, user_id=user_id)
-        if user_event_status is not None:
-            crud_user_event_status.remove(db=db, id=user_event_status.id)
-        else:
-            raise CustomException(http_code=400, message='User is not invited to the event')
-
-    @staticmethod
-    def approve_event_request(db=None, event_id: int = None, user_id: str = None, approve: str = None):
-        user_event_status = crud_user_event_status.get_user_event_status(db=db, event_id=event_id, user_id=user_id)
-        if user_event_status is None:
-            raise CustomException(http_code=400, message='User is not invited to the event')
-        else:
-            if approve == 'approved':
-                if user_event_status.status == 2:
-                    raise CustomException(http_code=400, message='User is approved event request')
-                crud_user_event_status.update(db=db, db_obj=user_event_status, obj_in={'status': 2})
-            if approve == 'rejected':
-                if user_event_status.status == 1:
-                    raise CustomException(http_code=400, message='User is rejected event request')
-                crud_user_event_status.update(db=db, db_obj=user_event_status, obj_in={'status': 1})
-
-    @staticmethod
     def get_event_requests(db=None, status=None, user_id: str = None):
         return {
             'event_requests': crud_user_event_status.get_event_requests(db=db, status=status, user_id=user_id)
@@ -134,66 +87,6 @@ class EventService(object):
             raise CustomException(http_code=400, message='User cannot this access')
         else:
             crud_like_event.remove(db=db, id=like_event_detail.id)
-
-    @staticmethod
-    def check_user_in_event(db=None, event_id: int = None, user_id: str = None):
-        event_detail = crud_event.get(db=db, id=event_id)
-        if event_detail.status == 1:
-            return True
-        if event_detail.host_id == user_id:
-            return True
-
-        user_event_status = crud_user_event_status.get_user_event_status(db=db, event_id=event_id, user_id=user_id)
-        if user_event_status is None:
-            return False
-        if user_event_status.status == 2:
-            return True
-
-        return False
-
-    @staticmethod
-    def join_event(db=None, event_id: int = None, user_id: str = None):
-        event_detail = crud_event.get(db=db, id=event_id)
-        if event_detail.status == 1:
-            user_event_status = crud_user_event_status.get_user_event_status(db=db, event_id=event_id, user_id=user_id)
-            if user_event_status:
-                raise CustomException(http_code=400, message='User has join this event')
-            user_event_status = UserEventStatus(
-                event_id=event_id,
-                user_id=user_id,
-                status=2
-            )
-            crud_user_event_status.create(db=db, obj_in=user_event_status)
-        else:
-            raise CustomException(http_code=400, message='Event is private')
-
-    @staticmethod
-    def out_event(db=None, event_id: int = None, user_id: str = None):
-        user_event_status = crud_user_event_status.get_user_event_status(db=db, event_id=event_id, user_id=user_id)
-        if user_event_status is None or user_event_status.status != 2:
-            raise CustomException(http_code=400, message='User has not joined this event')
-        else:
-            crud_user_event_status.remove(db=db, id=user_event_status.id)
-
-
-    # def search_event(self, db, req_data: EventsRequest, pagination: PaginationParamsRequest, user_id: str):
-    #     events = []
-    #     if req_data.type is None:
-    #         events = crud_event.get_all_events(db=db)
-    #     elif req_data.type.value == 'host':
-    #         events = crud_event.get_events_by_host_id(db=db, user_id=user_id)
-    #     elif req_data.type.value == 'join':
-    #
-    #     response = []
-    #     for event in events:
-    #         if self.check_user_in_event(db=db, event_id=event.id, user_id=user_id):
-    #             response.append(event)
-    #
-    #     for event in response:
-    #         event.images = self.get_event_images(db=db, event_id=event.id)
-    #     return {
-    #         'events': response
-    #     }
 
 
 event_srv = EventService()
