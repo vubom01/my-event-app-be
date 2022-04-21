@@ -34,8 +34,8 @@ def send_event_request(event_id: int, user_id: str, current_user: UserDetail = D
     return DataResponse().success_response(data=event_request)
 
 
-# @router.delete('/{event_id}/invite', dependencies=[Depends(login_required)])
-# def delete_user_event(event_id: int, user_id: str, current_user: UserDetail = Depends(login_required),
-#                       db: Session = Depends(deps.get_db)):
-#     event_request = event_srv.send_event_request(db=db, event_id=event_id, user_id=user_id, host_id=current_user.id)
-#     return DataResponse().success_response(data=event_request)
+@router.delete('/{event_id}/invite', dependencies=[Depends(login_required)])
+def delete_user_event(event_id: int, user_id: str, current_user: UserDetail = Depends(login_required),
+                      db: Session = Depends(deps.get_db)):
+    event_request = event_srv.delete_user_event(db=db, event_id=event_id, user_id=user_id, host_id=current_user.id)
+    return DataResponse().success_response(data=event_request)

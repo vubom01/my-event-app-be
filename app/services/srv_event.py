@@ -77,5 +77,17 @@ class EventService(object):
             )
             crud_user_event_status.create(db=db, obj_in=user_event_status)
 
+    @staticmethod
+    def delete_user_event(db=None, event_id: int = None, user_id: str = None, host_id: str = None):
+        event_detail = crud_event.get(db=db, id=event_id)
+        if event_detail.host_id != host_id:
+            raise CustomException(http_code=400, message='User is not host')
+
+        user_event_status = crud_user_event_status.get_user_event_status(db=db, event_id=event_id, user_id=user_id)
+        if user_event_status is not None:
+            crud_user_event_status.remove(db=db, id=user_event_status.id)
+        else:
+            raise CustomException(http_code=400, message='User is not invited to the event')
+
 
 event_srv = EventService()
