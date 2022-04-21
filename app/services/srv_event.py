@@ -35,11 +35,14 @@ class EventService:
     @staticmethod
     def get_detail(db=None, event_id: int = None, user_id: str = None):
         event = crud_event.get(db=db, id=event_id)
-        if event.status == 1:
+        if event is None:
+            raise CustomException(http_code=400, message='Event is not exist')
+        if event.status == 1 or event.host_id == user_id:
             return event
         else:
             user_event_status = crud_user_event_status.get_user_event_status(db=db, event_id=event_id, user_id=user_id)
-            if user_event_status.status == 2:
+            print(user_event_status)
+            if user_event_status is not None and user_event_status.status == 2:
                 return event
             else:
                 raise CustomException(http_code=400, message='User is not invited to the event')
