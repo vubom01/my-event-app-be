@@ -127,6 +127,14 @@ class EventService(object):
             raise CustomException(http_code=400, message='User cannot this access')
 
     @staticmethod
+    def unlike_event(db=None, event_id: int = None, user_id: str = None):
+        like_event_detail = crud_like_event.get_like_event(db=db, event_id=event_id, user_id=user_id)
+        if like_event_detail is None:
+            raise CustomException(http_code=400, message='User cannot this access')
+        else:
+            crud_like_event.remove(db=db, id=like_event_detail.id)
+
+    @staticmethod
     def check_user_in_event(db=None, event_id: int = None, user_id: str = None):
         event_detail = crud_event.get(db=db, id=event_id)
         if event_detail.status == 1:
