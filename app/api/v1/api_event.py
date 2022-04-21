@@ -11,7 +11,7 @@ from app.models.user_event_status_model import UserEventStatus
 from app.schemas.sche_base import DataResponse, ItemBaseModel
 from app.schemas.sche_event import EventCreateRequest, EventDetailResponse, EventsRequest, EventsResponse, EventRequest, \
     ApproveEventRequest
-from app.schemas.sche_user import UserDetail
+from app.schemas.sche_user import UserDetail, ListUser
 from app.schemas.sche_user_event_status import ListUserEventStatus
 from app.services.srv_event import event_srv
 
@@ -32,9 +32,11 @@ def get_events(req_data: EventsRequest = Depends(), pagination: PaginationParams
     return DataResponse().success_response(data=events)
 
 
-@router.get('/request',  dependencies=[Depends(login_required)], response_model=DataResponse[ListUserEventStatus])
-def get_event_requests(db: Session = Depends(deps.get_db), current_user: UserDetail = Depends(login_required)):
-    event_requests = event_srv.get_event_requests(db=db, user_id=current_user.id)
+@router.get('/request',  dependencies=[Depends(login_required)])
+def get_event_requests(query_params: Optional[str] = None, pagination: PaginationParamsRequest = Depends(),
+                       db: Session = Depends(deps.get_db), current_user: UserDetail = Depends(login_required)):
+    event_requests = event_srv.get_event_requests(db=db, user_id=current_user.id, query_params=query_params,
+                                                  page=pagination.page, page_size=pagination.page_size)
     return DataResponse().success_response(data=event_requests)
 
 
@@ -73,7 +75,7 @@ def approve_event_request(event_id: int, req_data: ApproveEventRequest,
     return DataResponse().success_response(data=response)
 
 
-@router.get('/{event_id}/event_request', dependencies=[Depends(login_required)])
+@router.get('/{event_id}/requests', dependencies=[Depends(login_required)], response_model=DataResponse[ListUser])
 def get_event_requests_of_event(event_id: int, status: StatusEventRequest, query_params: Optional[str] = None,
                                 pagination: PaginationParamsRequest = Depends(), db: Session = Depends(deps.get_db),
                                 current_user: UserDetail = Depends(login_required)):

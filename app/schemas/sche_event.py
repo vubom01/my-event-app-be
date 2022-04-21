@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import Optional, List
 
 from app.helpers.enums import SearchEventType, ApproveEventStatus
+from app.helpers.paging import PaginationParamsResponse
 from app.schemas.sche_base import ItemBaseModel
 
 
@@ -46,3 +47,13 @@ class EventRequest(ItemBaseModel):
 
 class ApproveEventRequest(ItemBaseModel):
     approve: ApproveEventStatus
+
+
+class InfoEventRequestDetail(ItemBaseModel):
+    event_id: int
+    event_name: str
+    event_description: Optional[str]
+    host_id: str
+    host_username: str
+    host_email: str
+    host_fullname: str

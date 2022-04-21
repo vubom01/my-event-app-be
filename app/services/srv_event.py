@@ -9,7 +9,7 @@ from app.crud.crud_user_event_status import crud_user_event_status
 from app.helpers.paging import PaginationParamsRequest
 from app.models.like_event_model import LikeEvent
 from app.models.user_event_status_model import UserEventStatus
-from app.schemas.sche_event import EventCreateRequest, EventDetail, EventsRequest
+from app.schemas.sche_event import EventCreateRequest, EventDetail, EventsRequest, InfoEventRequestDetail
 from app.schemas.sche_event_image import EventImageDetail
 from app.helpers.exception_handler import CustomException
 
@@ -56,9 +56,35 @@ class EventService(object):
         raise CustomException(http_code=400, message='User cannot this access')
 
     @staticmethod
-    def get_event_requests(db=None, user_id: str = None):
+    def get_event_requests(db, user_id: str, query_params: str, page: int, page_size: int):
+        event_requests = crud_user_event_status.get_event_requests(db=db, user_id=user_id)
+        response = []
+        for event_request in event_requests:
+            user = crud_user.get(db=db, id=event_request.user_id)
+            full_name = str(user.last_name + user.first_name)
+            if query_params is None or query_params.lower() in full_name.lower() \
+                    or query_params in str(user.email).lower() or query_params in str(user.username).lower():
+                event = crud_event.get(db=db, id=event_request.event_id)
+                res = InfoEventRequestDetail(
+                    event_id=event.id,
+                    event_name=event.event_name,
+                    event_description=event.description,
+                    host_id=user.id,
+                    host_username=user.username,
+                    host_email=user.email,
+                    host_fullname=full_name
+                )
+                response.append(res)
+
+        start_idx = (page - 1) * page_size
+        end_idx = min(page * page_size, len(response))
         return {
-            'event_requests': crud_user_event_status.get_event_requests(db=db, user_id=user_id)
+            'items': response[start_idx:end_idx],
+            'pagination': {
+                'current_page': page,
+                'page_size': page_size,
+                'total_items': len(response)
+            }
         }
 
     def like_event(self, db=None, event_id: int = None, user_id: str = None):
