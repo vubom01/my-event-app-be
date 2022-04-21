@@ -3,7 +3,9 @@ from typing import List
 
 from app.crud.crud_event import crud_event
 from app.crud.crud_event_image import crud_event_image
+from app.crud.crud_like_event import crud_like_event
 from app.crud.crud_user_event_status import crud_user_event_status
+from app.models.like_event_model import LikeEvent
 from app.models.user_event_status_model import UserEventStatus
 from app.schemas.sche_event import EventCreateRequest, EventDetail
 from app.schemas.sche_event_image import EventImageDetail
@@ -109,6 +111,36 @@ class EventService(object):
         return {
             'event_requests': crud_user_event_status.get_event_requests(db=db, status=status, user_id=user_id)
         }
+
+    def like_event(self, db=None, event_id: int = None, user_id: str = None):
+        like_event_detail = crud_like_event.get_like_event(db=db, event_id=event_id, user_id=user_id)
+        if like_event_detail:
+            raise CustomException(http_code=400, message='User has liked this event')
+
+        like_event = LikeEvent(
+            event_id=event_id,
+            user_id=user_id
+        )
+        if self.check_user_in_event(db=db, event_id=event_id, user_id=user_id):
+            crud_like_event.create(db=db, obj_in=like_event)
+        else:
+            raise CustomException(http_code=400, message='User cannot this access')
+
+    @staticmethod
+    def check_user_in_event(db=None, event_id: int = None, user_id: str = None):
+        event_detail = crud_event.get(db=db, id=event_id)
+        if event_detail.status == 1:
+            return True
+        if event_detail.host_id == user_id:
+            return True
+
+        user_event_status = crud_user_event_status.get_user_event_status(db=db, event_id=event_id, user_id=user_id)
+        if user_event_status is None:
+            return False
+        if user_event_status.status == 2:
+            return True
+
+        return False
 
 
 event_srv = EventService()

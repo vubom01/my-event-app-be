@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Optional, List
 
+from app.helpers.enums import SearchEventType
 from app.schemas.sche_base import ItemBaseModel
 
 
@@ -26,6 +27,7 @@ class EventDetailResponse(EventDetail):
 
 
 class EventsRequest(ItemBaseModel):
+    type: Optional[SearchEventType]
     host_info: Optional[str]
     event_name: Optional[str]
     topic: Optional[str]
