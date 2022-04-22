@@ -111,3 +111,7 @@ class UserService:
                 'total_items': len(response)
             }
         }
+
+    @staticmethod
+    def get_user_by_id(db, user_id):
+        return crud_user.get(db=db, id=user_id)
