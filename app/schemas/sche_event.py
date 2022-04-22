@@ -37,8 +37,14 @@ class EventsRequest(ItemBaseModel):
     status: Optional[int]
 
 
+class EventWithHostInfo(EventDetailResponse):
+    host_fullname: str
+    host_username: str
+    host_email: str
+
+
 class EventsResponse(ItemBaseModel):
-    items: List[EventDetailResponse]
+    items: List[EventWithHostInfo]
     pagination: PaginationParamsResponse
 
 

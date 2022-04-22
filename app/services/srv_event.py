@@ -9,7 +9,8 @@ from app.crud.crud_user_event_status import crud_user_event_status
 from app.helpers.paging import PaginationParamsRequest
 from app.models.like_event_model import LikeEvent
 from app.models.user_event_status_model import UserEventStatus
-from app.schemas.sche_event import EventCreateRequest, EventDetail, EventsRequest, InfoEventRequestDetail
+from app.schemas.sche_event import EventCreateRequest, EventDetail, EventsRequest, InfoEventRequestDetail, \
+    EventWithHostInfo
 from app.schemas.sche_event_image import EventImageDetail
 from app.helpers.exception_handler import CustomException
 
@@ -61,7 +62,7 @@ class EventService(object):
         response = []
         for event_request in event_requests:
             user = crud_user.get(db=db, id=event_request.user_id)
-            full_name = str(user.last_name + user.first_name)
+            full_name = str(user.last_name + ' ' + user.first_name)
             if query_params is None or query_params.lower() in full_name.lower() \
                     or query_params in str(user.email).lower() or query_params in str(user.username).lower():
                 event = crud_event.get(db=db, id=event_request.event_id)
@@ -195,7 +196,7 @@ class EventService(object):
         users = crud_user.get_list_user(db=db, user_id=user_ids)
         response = []
         for user in users:
-            full_name = str(user.last_name + user.first_name)
+            full_name = str(user.last_name + ' ' + user.first_name)
             if query_params is None or query_params.lower() in full_name.lower() \
                     or query_params in str(user.email).lower() or query_params in str(user.username).lower():
                 response.append(user)
@@ -271,7 +272,7 @@ class EventService(object):
             host_detail = crud_user.get(db=db, id=event.host_id)
             if req_data.host_info:
                 query_params = str(req_data.host_info)
-                full_name = str(host_detail.last_name + host_detail.first_name)
+                full_name = str(host_detail.last_name + ' ' + host_detail.first_name)
                 if query_params.lower() in full_name.lower() \
                         or query_params in str(host_detail.email).lower() \
                         or query_params in str(host_detail.username).lower():
@@ -290,12 +291,17 @@ class EventService(object):
             if req_data.end_at:
                 if str(req_data.end_at) < str(event.end_at):
                     check = False
-
             if check is True:
-                response.append(event)
+                res = event
+                res.host_fullname = str(host_detail.last_name + ' ' + host_detail.first_name)
+                res.host_username = host_detail.username
+                res.host_email = host_detail.email
+                res.images = self.get_event_images(db=db, event_id=event.id)
+                response.append(res)
 
         start_idx = (pagination.page - 1) * pagination.page_size
         end_idx = min(pagination.page * pagination.page_size, len(response))
+
         return {
             'items': response[start_idx:end_idx],
             'pagination': {

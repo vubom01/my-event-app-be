@@ -94,7 +94,7 @@ class UserService:
 
         response = []
         for user in users:
-            full_name = str(user.last_name + user.first_name)
+            full_name = str(user.last_name + ' ' + user.first_name)
             if user.id == user_id:
                 continue
             if query_params is None or query_params.lower() in full_name.lower() \

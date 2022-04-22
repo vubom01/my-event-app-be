@@ -66,7 +66,7 @@ class FriendService:
         list_friends = crud_user.get_list_user(db=db, user_id=friend_id)
         response = []
         for friend in list_friends:
-            full_name = str(friend.last_name + friend.first_name)
+            full_name = str(friend.last_name + ' ' + friend.first_name)
             if queryParams is None or queryParams.lower() in full_name.lower() \
                     or queryParams in str(friend.email).lower() or queryParams in str(friend.username).lower():
                 response.append(friend)
