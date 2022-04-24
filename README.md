@@ -1,5 +1,7 @@
 # My Event App Be
+
 ## Install and running app
+
 ```
 $ git clone https://github.com/vubom01/my-event-app-be.git
 $ cd my-event-app-be
