@@ -35,8 +35,10 @@ class EventsRequest(ItemBaseModel):
     host_info: Optional[str]
     event_name: Optional[str]
     topic: Optional[str]
-    start_at: Optional[datetime]
-    end_at: Optional[datetime]
+    start_at_start: Optional[datetime]
+    start_at_end: Optional[datetime]
+    end_at_start: Optional[datetime]
+    end_at_end: Optional[datetime]
     status: Optional[int]
 
 

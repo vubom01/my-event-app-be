@@ -299,11 +299,17 @@ class EventService(object):
             if req_data.topic:
                 if str(req_data.topic) not in str(event.topic):
                     check = False
-            if req_data.start_at:
-                if str(req_data.start_at) > str(event.start_at):
+            if req_data.start_at_start:
+                if str(req_data.start_at_start) > str(event.start_at):
                     check = False
-            if req_data.end_at:
-                if str(req_data.end_at) < str(event.end_at):
+            if req_data.start_at_end:
+                if str(req_data.start_at_end) < str(event.start_at):
+                    check = False
+            if req_data.end_at_start:
+                if str(req_data.end_at_start) > str(event.end_at):
+                    check = False
+            if req_data.end_at_end:
+                if str(req_data.end_at_end) < str(event.end_at):
                     check = False
             if check is True:
                 res = event
