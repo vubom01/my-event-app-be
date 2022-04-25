@@ -53,7 +53,21 @@ class EventService(object):
         if self.check_user_in_event(db=db, event_id=event_id, user_id=user_id):
             images = self.get_event_images(db=db, event_id=event_id)
             event.images = images
+            response = event
+
+            host_detail = crud_user.get(db=db, id=event.host_id)
+            response.host_fullname = str(host_detail.last_name + ' ' + host_detail.first_name)
+
+            user_event_status = crud_user_event_status.get_user_event_status(db=db, event_id=event_id, user_id=user_id)
+            if (user_event_status and user_event_status.status == 1) or (host_detail.id == user_id):
+                response.joined = True
+
+            like_event = crud_like_event.get_like_event(db=db, event_id=event_id, user_id=user_id)
+            if like_event:
+                response.liked = True
+
             return event
+
         raise CustomException(http_code=400, message='User cannot this access')
 
     @staticmethod

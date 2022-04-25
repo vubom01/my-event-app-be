@@ -25,6 +25,9 @@ class EventCreateRequest(EventDetail):
 class EventDetailResponse(EventDetail):
     id: int
     images: Optional[List[str]]
+    host_fullname: Optional[str]
+    liked: Optional[bool]
+    joined: Optional[bool]
 
 
 class EventsRequest(ItemBaseModel):
