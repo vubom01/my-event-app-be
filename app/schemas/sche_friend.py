@@ -26,3 +26,7 @@ class ListFriendRequest(ItemBaseModel):
 
 class ApproveFriendRequest(ItemBaseModel):
     status: int
+
+
+class FriendId(ItemBaseModel):
+    friend_id: str

@@ -31,12 +31,12 @@ class FriendService:
         return response.id
 
     @staticmethod
-    def get_list_friend_request(db=None, page: int = None, page_size: int = None, user_id: int = None):
+    def get_list_friend_request(db=None, page: int = None, page_size: int = None, user_id: str = None):
         fried_requests = crud_friend.get_list_request(db=db, page=page, page_size=page_size, user_id=user_id)
         return fried_requests
 
     @staticmethod
-    def approve_fried_request(db=None, friend_request_id: int = None, status: int = None, user_id: int = None):
+    def approve_fried_request(db=None, friend_request_id: int = None, status: int = None, user_id: str = None):
         friend_request = crud_friend.get(db=db, id=friend_request_id)
         if friend_request is None:
             raise CustomException(http_code=400, message="Not found")
@@ -57,7 +57,7 @@ class FriendService:
         return resp
 
     @staticmethod
-    def get_list_friends(db=None, user_id: int = None, page: int = None, page_size: int = None,
+    def get_list_friends(db=None, user_id: str = None, page: int = None, page_size: int = None,
                          queryParams: str = None):
         friends = crud_friend.get_all_friends(db=db, user_id=user_id)
         friend_id = []
@@ -81,3 +81,14 @@ class FriendService:
                 'total_items': len(response)
             }
         }
+
+    @staticmethod
+    def remove_friend(user_id: str, friend_id: str, db=None):
+        friend_request = crud_friend.get_friend_request(user_id=friend_id, friend_id=user_id, db=db)
+        if friend_request.status == 1:
+            crud_friend.remove(db=db, id=friend_request.id)
+            friend_request = crud_friend.get_friend_request(user_id=user_id, friend_id=friend_id, db=db)
+            crud_friend.remove(db=db, id=friend_request.id)
+        else:
+            crud_friend.remove(db=db, id=friend_request.id)
+        
