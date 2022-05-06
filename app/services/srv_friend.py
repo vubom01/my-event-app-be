@@ -36,7 +36,8 @@ class FriendService:
         return fried_requests
 
     @staticmethod
-    def approve_fried_request(db=None, friend_request_id: int = None, status: int = None, user_id: int = None):
+    def approve_friend_request(db=None, friend_request_id: int = None, status: int = None, user_id: int = None):
+        print(status)
         friend_request = crud_friend.get(db=db, id=friend_request_id)
         if friend_request is None:
             raise CustomException(http_code=400, message="Not found")

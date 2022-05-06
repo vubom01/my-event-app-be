@@ -24,8 +24,8 @@ def send_friend_request(current_user: UserDetail = Depends(login_required), requ
 @router.put('/{friend_request_id}', dependencies=[Depends(login_required)])
 def approve_friend_request(req_data: ApproveFriendRequest = None, db: Session = Depends(deps.get_db),
                            friend_request_id: int = None, current_user: UserDetail = Depends(login_required)):
-    response = FriendService.approve_fried_request(db=db, friend_request_id=friend_request_id, status=req_data.status,
-                                                   user_id = current_user.id)
+    response = FriendService.approve_friend_request(db=db, friend_request_id=friend_request_id, status=req_data.status,
+                                                    user_id = current_user.id)
     return DataResponse().success_response(data=response)
 
 
