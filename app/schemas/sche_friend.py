@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from app.helpers.paging import PaginationParamsResponse
 from app.schemas.sche_base import ItemBaseModel
@@ -30,3 +30,4 @@ class ApproveFriendRequest(ItemBaseModel):
 
 class FriendId(ItemBaseModel):
     friend_id: str
+    status: Optional[int] = 0
