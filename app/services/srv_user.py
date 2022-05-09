@@ -13,6 +13,7 @@ from app.api import deps
 from app.core.config import settings
 from app.core.error import error_code, message
 from app.core.security import get_password_hash, verify_password
+from app.crud.crud_friend import crud_friend
 from app.crud.crud_user import crud_user
 from app.helpers.exception_handler import CustomException, ValidateException
 from app.schemas.sche_token import TokenPayload
@@ -113,5 +114,15 @@ class UserService:
         }
 
     @staticmethod
-    def get_user_by_id(db, user_id):
-        return crud_user.get(db=db, id=user_id)
+    def get_user_by_id(db, user_id, id):
+        user = crud_user.get(db=db, id=id)
+        if user is None:
+            raise CustomException(http_code=400, message='User not found')
+        if user.id == user_id:
+            user.is_friend = -2
+        else:
+            friend_request = crud_friend.get_friend_request(db=db, user_id=user.id, friend_id=user_id)
+            if friend_request is None:
+                user.is_friend = -1
+            else: user.is_friend = friend_request.status
+        return user

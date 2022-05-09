@@ -46,7 +46,8 @@ def get_list_users(db: Session = Depends(deps.get_db), query_params: Optional[st
     return DataResponse().success_response(data=users)
 
 
-@router.get('/{user_id}', dependencies=[Depends(login_required)])
-def get_user_by_id(user_id: str, db: Session = Depends(deps.get_db)):
-    user = UserService.get_user_by_id(db=db, user_id=user_id)
+@router.get('/{id}', dependencies=[Depends(login_required)])
+def get_user_by_id(id: str, current_user: UserDetail = Depends(login_required),
+                   db: Session = Depends(deps.get_db)):
+    user = UserService.get_user_by_id(db=db, id=id, user_id=current_user.id)
     return DataResponse().success_response(data=user)
