@@ -23,11 +23,12 @@ def upload_images(images: List[UploadFile] = File(...)):
 
 
 @router.post('/email', dependencies=[Depends(login_required)])
-async def send_mail(email: List[EmailStr], body_mail: BodyEmail):
+async def send_mail(emails: List[EmailStr], body_mail: BodyEmail):
     message = MessageSchema(
         subject=body_mail.subject,
-        recipients=email,
-        body=body_mail.body
+        recipients=emails,
+        body=body_mail.body,
+        subtype="html"
     )
     fm = FastMail(mail_config)
     await fm.send_message(message)
