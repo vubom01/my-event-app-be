@@ -22,7 +22,7 @@ class CRUDMessage(CRUDBase[MessageDetail, MessageDetail, MessageDetail]):
 
     def get_last_message(self, event_id: int, db: Session):
         message = db.query(self.model).filter(self.model.event_id == event_id).\
-            order_by(text(f"created_at asc")).first()
+            order_by(text(f"created_at desc")).first()
         return message
 
 
