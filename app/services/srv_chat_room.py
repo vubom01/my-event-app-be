@@ -38,7 +38,7 @@ class ChatRoomService(object):
         message = crud_message.get_message(event_id=event_id, page=page, page_size=page_size, db=db)
         for item in message.items:
             user_detail = crud_user.get(db=db, id=item.user_id)
-            full_name = full_name = str(user_detail.last_name + ' ' + user_detail.first_name)
+            full_name = str(user_detail.last_name + ' ' + user_detail.first_name)
             item.user_name = full_name
             item.user_image = user_detail.avatar
 
