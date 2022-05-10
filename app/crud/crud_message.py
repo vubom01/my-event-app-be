@@ -1,3 +1,4 @@
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.crud.crud_base import CRUDBase
@@ -17,6 +18,11 @@ class CRUDMessage(CRUDBase[MessageDetail, MessageDetail, MessageDetail]):
             direction='desc'
         )
         message = self.paginate(query, pagination)
+        return message
+
+    def get_last_message(self, event_id: int, db: Session):
+        message = db.query(self.model).filter(self.model.event_id == event_id).\
+            order_by(text(f"created_at asc")).first()
         return message
 
 
