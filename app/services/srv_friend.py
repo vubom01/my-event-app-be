@@ -59,8 +59,8 @@ class FriendService:
 
     @staticmethod
     def get_list_friends(db=None, user_id: str = None, page: int = None, page_size: int = None,
-                         queryParams: str = None):
-        friends = crud_friend.get_all_friends(db=db, user_id=user_id)
+                         queryParams: str = None, status: int = None):
+        friends = crud_friend.get_all_friends(db=db, user_id=user_id, status=status)
         friend_id = []
         for friend in friends:
             friend_id.append(friend.friend_id)

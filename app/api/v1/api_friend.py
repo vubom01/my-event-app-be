@@ -38,9 +38,9 @@ def get_list_friend_requests(current_user: UserDetail = Depends(login_required),
 
 
 @router.get('', response_model=DataResponse[ListUser])
-def get_list_friends(current_user: UserDetail = Depends(login_required), queryParams: Optional[str] = None,
+def get_list_friends(status: int, current_user: UserDetail = Depends(login_required), queryParams: Optional[str] = None,
                      pagination: PaginationParamsRequest = Depends(), db: Session = Depends(deps.get_db)):
-    response = FriendService.get_list_friends(db=db, user_id=current_user.id, queryParams=queryParams,
+    response = FriendService.get_list_friends(db=db, user_id=current_user.id, queryParams=queryParams, status=status,
                                               page=pagination.page, page_size=pagination.page_size)
     return DataResponse().success_response(data=response)
 

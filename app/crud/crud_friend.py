@@ -26,8 +26,8 @@ class CRUDFriend(CRUDBase[FriendRequestDetail, FriendRequestDetail, FriendReques
         resp = self.update(db=db, db_obj=friend_request, obj_in={'status': 1})
         return resp
 
-    def get_all_friends(self, db: Session, user_id: int):
-        return db.query(self.model).filter(self.model.user_id == user_id, self.model.status == 1)
+    def get_all_friends(self, db: Session, user_id: int, status: int = 1):
+        return db.query(self.model).filter(self.model.user_id == user_id, self.model.status == status)
 
 
 crud_friend = CRUDFriend(Friend)
