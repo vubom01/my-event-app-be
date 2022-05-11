@@ -1,28 +1,35 @@
-from typing import Any
+from typing import Any, Optional, List
 
 import jwt
 import logging
 
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, BackgroundTasks
 from fastapi.security import HTTPBearer
-from pydantic import ValidationError
+from fastapi_mail import MessageSchema, FastMail
+from pydantic import ValidationError, EmailStr
 from starlette import status
 from sqlalchemy.orm import Session
 
 from app.api import deps
-from app.core.config import settings
+from app.core.config import settings, mail_config
 from app.core.error import error_code, message
 from app.core.security import get_password_hash, verify_password
 from app.crud.crud_friend import crud_friend
 from app.crud.crud_user import crud_user
 from app.helpers.exception_handler import CustomException, ValidateException
+from app.schemas.sche_base import ItemBaseModel
 from app.schemas.sche_token import TokenPayload
 from app.schemas.sche_user import UserDetail, UserUpdateRequest
 
 logger = logging.getLogger()
 
 
-class UserService:
+class BodyEmail(ItemBaseModel):
+    subject: Optional[str]
+    body: str
+
+
+class UserService(object):
 
     __instance = None
 
@@ -60,8 +67,7 @@ class UserService:
                 )
             return crud_user.get(db=db, id=token_data.user_id)
 
-    @staticmethod
-    def create_user(db=None, user: UserDetail = None):
+    def create_user(self, background_tasks: BackgroundTasks, db=None, user: UserDetail = None):
         user_detail = crud_user.get_user_by_filter(db=db, username=user.username)
         if user_detail:
             raise CustomException(http_code=400, message='Username is already in use')
@@ -72,6 +78,12 @@ class UserService:
 
         user.password = get_password_hash(user.password)
         user = crud_user.create(db=db, obj_in=user)
+        body_mail = BodyEmail(
+            subject="Đăng ký tài khoản thành công",
+            body="Chúc mừng bạn đã đăng ký tài khoản thành công, hãy đăng nhập ngay "
+                 "để trải nghiệm những sự kiện thú vị cùng bạn bè nhé"
+        )
+        background_tasks.add_task(func=self.send_mail, emails=[user.email], body_mail=body_mail)
         return user
 
     @staticmethod
@@ -126,3 +138,19 @@ class UserService:
                 user.is_friend = -1
             else: user.is_friend = friend_request.status
         return user
+
+    @staticmethod
+    async def send_mail(emails: List[EmailStr], body_mail: BodyEmail):
+        message = MessageSchema(
+            subject=body_mail.subject,
+            recipients=emails,
+            body=body_mail.body
+        )
+        fm = FastMail(mail_config)
+        await fm.send_message(message)
+        return {
+            'message': 'email has been sent'
+        }
+
+
+user_srv = UserService()
