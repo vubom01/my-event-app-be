@@ -336,6 +336,23 @@ class EventService(object):
             raise CustomException(http_code=400, message="Don't have permission")
         crud_event.remove(db=db, id=event_id)
 
+    def edit_event(self, event: EventCreateRequest, event_id: int, user_id: str, db):
+        if self.is_host_event(event_id, user_id, db) is False:
+            raise CustomException(http_code=400, message="Don't have permission")
+        event_detail = crud_event.get(db=db, id=event_id)
+        response = crud_event.update(db=db, db_obj=event_detail, obj_in=event.dict(exclude_none=True))
+
+        image_requests = list()
+        for image in event.images:
+            image_request = EventImageDetail(
+                event_id=event_id,
+                image=image
+            )
+            image_requests.append(image_request)
+        crud_event_image.create_multi(db=db, list_obj_in=image_requests)
+
+        return response
+
     @staticmethod
     def is_host_event(event_id: int, user_id: str, db):
         event_detail = crud_event.get(db=db, id=event_id)

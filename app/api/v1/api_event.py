@@ -54,6 +54,13 @@ def delete_event(event_id: int, current_user: UserDetail = Depends(login_require
     return DataResponse().success_response(data=response)
 
 
+@router.put('/{event_id}', dependencies=[Depends(login_required)])
+def edit_event(event_id: int, request: EventCreateRequest, current_user: UserDetail = Depends(login_required),
+               db: Session = Depends(deps.get_db)):
+    event = event_srv.edit_event(event=request, event_id=event_id, user_id=current_user.id, db=db)
+    return DataResponse().success_response(data=event)
+
+
 @router.post('/{event_id}/like', dependencies=[Depends(login_required)])
 def like_event(event_id: int, current_user: UserDetail = Depends(login_required), db: Session = Depends(deps.get_db)):
     response = event_srv.like_event(db=db, event_id=event_id, user_id=current_user.id)
