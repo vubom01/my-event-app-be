@@ -2,7 +2,9 @@ from typing import List, Optional
 from fastapi import APIRouter, File, UploadFile, Depends
 from fastapi_mail import MessageSchema, FastMail
 from pydantic import EmailStr
+from sqlalchemy.orm import Session
 
+from app.api import deps
 from app.core.config import mail_config
 from app.helpers.login_manager import login_required
 from app.schemas.sche_base import DataResponse, ItemBaseModel
@@ -14,6 +16,8 @@ router = APIRouter()
 # class BodyEmail(ItemBaseModel):
 #     subject: Optional[str]
 #     body: str
+class Image(ItemBaseModel):
+    image_urls: List[str]
 
 
 @router.post('/upload')
@@ -21,9 +25,10 @@ def upload_images(images: List[UploadFile] = File(...)):
     urls = CommonService.upload_list_images(images=images)
     return DataResponse().success_response(data=urls)
 
+
 @router.delete('/delete')
-def delete_images(image_urls: List[str] = []):
-    data = CommonService.delete_image(image_urls)
+def delete_images(request: Image, db: Session = Depends(deps.get_db)):
+    data = CommonService.delete_image(image_urls=request.image_urls, db=db)
     return DataResponse().success_response(data=data)
 
 # @router.post('/email', dependencies=[Depends(login_required)])

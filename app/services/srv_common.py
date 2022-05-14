@@ -34,6 +34,6 @@ class CommonService:
         return urls
 
     @staticmethod
-    def delete_image(image_urls: List[str]):
-        crud_event_image.delete_images(image_urls)
+    def delete_image(image_urls: List[str], db):
+        return crud_event_image.delete_images(image_urls=image_urls, db=db)
         
