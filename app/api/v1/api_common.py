@@ -21,6 +21,10 @@ def upload_images(images: List[UploadFile] = File(...)):
     urls = CommonService.upload_list_images(images=images)
     return DataResponse().success_response(data=urls)
 
+@router.delete('/delete')
+def delete_images(image_urls: List[str] = []):
+    data = CommonService.delete_image(image_urls)
+    return DataResponse().success_response(data=data)
 
 # @router.post('/email', dependencies=[Depends(login_required)])
 # async def send_mail(emails: List[EmailStr], body_mail: BodyEmail):

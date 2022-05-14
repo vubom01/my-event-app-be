@@ -10,5 +10,12 @@ class CRUDEventImage(CRUDBase[EventImageDetail, EventImageDetail, EventImageDeta
     def get_event_images(self, db: Session, event_id: int):
         return db.query(self.model).filter(self.model.event_id == event_id).all()
 
+    def delete_images(self, db: Session, image_urls: list[str]):
+        obj = db.query(self.model).filter(self.model.image.in_(image_urls)).all()
+        db.delete(obj)
+        db.commit()
+
+
+
 
 crud_event_image = CRUDEventImage(EventImage)

@@ -6,6 +6,8 @@ import app.core.connection
 from typing import List
 from fastapi import HTTPException, File
 
+from app.crud.crud_event_image import crud_event_image
+
 logger = logging.getLogger()
 
 
@@ -30,3 +32,8 @@ class CommonService:
                 raise HTTPException(status_code=400, detail='Can not upload file ' + image.filename)
             urls.append(CommonService.upload_image(image=image.file))
         return urls
+
+    @staticmethod
+    def delete_image(image_urls: List[str]):
+        crud_event_image.delete_images(image_urls)
+        
