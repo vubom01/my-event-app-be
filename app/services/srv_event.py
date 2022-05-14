@@ -331,5 +331,19 @@ class EventService(object):
             }
         }
 
+    def delete_event(self, event_id: int, user_id: str, db):
+        if self.is_host_event(event_id, user_id, db) is False:
+            raise CustomException(http_code=400, message="Don't have permission")
+        crud_event.remove(db=db, id=event_id)
+
+    @staticmethod
+    def is_host_event(event_id: int, user_id: str, db):
+        event_detail = crud_event.get(db=db, id=event_id)
+        if event_detail is None:
+            raise CustomException(http_code=400, message='Event is not found')
+        if event_detail.host_id == user_id:
+            return True
+        return False
+
 
 event_srv = EventService()
