@@ -3,8 +3,8 @@ from typing import List
 from fastapi_mail import MessageSchema, FastMail
 from pydantic import EmailStr
 
-from app.api.v1.api_common import BodyEmail
 from app.core.config import mail_config
+from app.schemas.sche_email import BodyEmail
 
 
 async def send_mail(emails: List[EmailStr], body_mail: BodyEmail):

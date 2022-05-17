@@ -7,7 +7,7 @@ from app.api import deps
 from app.helpers.constant import LENGTH_OF_TERMINAL_CODE, LETTERS
 from app.schemas.sche_base import DataResponse
 from app.schemas.sche_user import UserDetailRequest
-from app.services.srv_user import user_srv
+from app.services.srv_user import UserService
 
 router = APIRouter()
 
@@ -22,5 +22,5 @@ def random_code() -> str:
 @router.post('')
 def register(background_tasks: BackgroundTasks, db: Session = Depends(deps.get_db), user: UserDetailRequest = None):
     user.id = random_code()
-    user = user_srv.create_user(db=db, user=user, background_tasks=background_tasks)
+    user = UserService.create_user(db=db, user=user, background_tasks=background_tasks)
     return DataResponse().success_response(data={'user_id': user.id})

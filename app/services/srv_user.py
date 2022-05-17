@@ -11,6 +11,7 @@ from starlette import status
 from sqlalchemy.orm import Session
 
 from app.api import deps
+from app.core import email_handle
 from app.core.config import settings, mail_config
 from app.core.error import error_code, message
 from app.core.security import get_password_hash, verify_password
@@ -18,15 +19,11 @@ from app.crud.crud_friend import crud_friend
 from app.crud.crud_user import crud_user
 from app.helpers.exception_handler import CustomException, ValidateException
 from app.schemas.sche_base import ItemBaseModel
+from app.schemas.sche_email import BodyEmail
 from app.schemas.sche_token import TokenPayload
 from app.schemas.sche_user import UserDetail, UserUpdateRequest
 
 logger = logging.getLogger()
-
-
-class BodyEmail(ItemBaseModel):
-    subject: Optional[str]
-    body: str
 
 
 class UserService(object):
@@ -67,7 +64,8 @@ class UserService(object):
                 )
             return crud_user.get(db=db, id=token_data.user_id)
 
-    def create_user(self, background_tasks: BackgroundTasks, db=None, user: UserDetail = None):
+    @staticmethod
+    def create_user(background_tasks: BackgroundTasks, db=None, user: UserDetail = None):
         user_detail = crud_user.get_user_by_filter(db=db, username=user.username)
         if user_detail:
             raise CustomException(http_code=400, message='Username is already in use')
@@ -83,7 +81,7 @@ class UserService(object):
             body="Chúc mừng bạn đã đăng ký tài khoản thành công, hãy đăng nhập ngay "
                  "để trải nghiệm những sự kiện thú vị cùng bạn bè nhé"
         )
-        background_tasks.add_task(func=self.send_mail, emails=[user.email], body_mail=body_mail)
+        background_tasks.add_task(func=email_handle.send_mail, emails=[user.email], body_mail=body_mail)
         return user
 
     @staticmethod
@@ -138,19 +136,3 @@ class UserService(object):
                 user.is_friend = -1
             else: user.is_friend = friend_request.status
         return user
-
-    @staticmethod
-    async def send_mail(emails: List[EmailStr], body_mail: BodyEmail):
-        message = MessageSchema(
-            subject=body_mail.subject,
-            recipients=emails,
-            body=body_mail.body
-        )
-        fm = FastMail(mail_config)
-        await fm.send_message(message)
-        return {
-            'message': 'email has been sent'
-        }
-
-
-user_srv = UserService()
