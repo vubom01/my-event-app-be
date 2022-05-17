@@ -146,25 +146,26 @@ class EventService(object):
             raise CustomException(http_code=400, message='Event is not exist')
 
     @staticmethod
-    def send_event_request(db=None, event_id: int = None, user_id: int = None, host_id: int = None):
+    def send_event_request(db=None, event_id: int = None, user_ids: List[str] = None, host_id: int = None):
         event_detail = crud_event.get(db=db, id=event_id)
         if event_detail is None:
             raise CustomException(http_code=400, message='Event is not exist')
         if event_detail.host_id != host_id:
             raise CustomException(http_code=400, message='User cannot this access')
 
-        user_event_status = crud_user_event_status.get_user_event_status(db=db, event_id=event_id, user_id=user_id)
-        if user_event_status:
-            if user_event_status.status == 0:
-                raise CustomException(http_code=400, message='Request has sent')
-            if user_event_status.status == 1:
-                raise CustomException(http_code=400, message='User attended the event')
-        else:
-            user_event_status = UserEventStatus(
-                event_id=event_id,
-                user_id=user_id
-            )
-            crud_user_event_status.create(db=db, obj_in=user_event_status)
+        for user_id in user_ids:
+            user_event_status = crud_user_event_status.get_user_event_status(db=db, event_id=event_id, user_id=user_id)
+            if user_event_status:
+                if user_event_status.status == 0:
+                    raise CustomException(http_code=400, message='Request has sent')
+                if user_event_status.status == 1:
+                    raise CustomException(http_code=400, message='User attended the event')
+            else:
+                user_event_status = UserEventStatus(
+                    event_id=event_id,
+                    user_id=user_id
+                )
+                crud_user_event_status.create(db=db, obj_in=user_event_status)
 
     def approve_event_request(self, db, event_id: int, user_id: int, approve: str):
         self.check_exist_event(db=db, event_id=event_id)

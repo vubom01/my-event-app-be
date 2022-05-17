@@ -54,7 +54,7 @@ class EventsResponse(ItemBaseModel):
 
 
 class EventRequest(ItemBaseModel):
-    user_id: str
+    user_id: List[str]
 
 
 class ApproveEventRequest(ItemBaseModel):
