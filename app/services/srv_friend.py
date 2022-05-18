@@ -32,8 +32,15 @@ class FriendService:
 
     @staticmethod
     def get_list_friend_request(db=None, page: int = None, page_size: int = None, user_id: str = None):
-        fried_requests = crud_friend.get_list_request(db=db, page=page, page_size=page_size, user_id=user_id)
-        return fried_requests
+        friend_requests = crud_friend.get_list_request(db=db, page=page, page_size=page_size, user_id=user_id)
+        for friend_request in friend_requests.items:
+            user = crud_user.get(db=db, id=friend_request.friend_id)
+            friend_request.username = user.username
+            friend_request.first_name = user.first_name
+            friend_request.last_name = user.last_name
+            friend_request.email = user.email
+            friend_request.phone_number = user.phone_number
+        return friend_requests
 
     @staticmethod
     def approve_friend_request(db=None, friend_request_id: int = None, status: int = None, user_id: int = None):

@@ -17,6 +17,11 @@ class FriendRequest(ItemBaseModel):
 class FriendDetail(ItemBaseModel):
     id: int
     friend_id: str
+    username: str
+    first_name: str
+    last_name: str
+    email: str
+    phone_number: Optional[str]
 
 
 class ListFriendRequest(ItemBaseModel):
