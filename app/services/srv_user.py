@@ -134,5 +134,9 @@ class UserService(object):
             friend_request = crud_friend.get_friend_request(db=db, user_id=user.id, friend_id=user_id)
             if friend_request is None:
                 user.is_friend = -1
-            else: user.is_friend = friend_request.status
+            else:
+                user.is_friend = friend_request.status
+            friend_request = crud_friend.get_friend_request(db=db, user_id=user_id, friend_id=user.id)
+            if friend_request is not None and friend_request.status == 0:
+                user.is_friend = 2
         return user
