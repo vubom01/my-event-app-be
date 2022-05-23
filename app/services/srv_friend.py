@@ -37,14 +37,16 @@ class FriendService:
         else:
             friend_requests = crud_friend.get_list_send(db=db, page=page, page_size=page_size, user_id=user_id)
         for friend_request in friend_requests.items:
-            user = crud_user.get(db=db, id=friend_request.friend_id)
             if friend_request.friend_id == user_id:
                 friend_request.friend_id = friend_request.user_id
+            user = crud_user.get(db=db, id=friend_request.friend_id)
+
             friend_request.username = user.username
             friend_request.first_name = user.first_name
             friend_request.last_name = user.last_name
             friend_request.email = user.email
             friend_request.phone_number = user.phone_number
+            friend_request.avatar = user.avatar
         return friend_requests
 
     @staticmethod
