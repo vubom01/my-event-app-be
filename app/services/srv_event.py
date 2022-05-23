@@ -135,7 +135,7 @@ class EventService(object):
         user_event_status = crud_user_event_status.get_user_event_status(db=db, event_id=event_id, user_id=user_id)
         if user_event_status is None:
             return False
-        if user_event_status.status == 1:
+        if user_event_status.status == 0 or user_event_status.status == 1:
             return True
         return False
 
