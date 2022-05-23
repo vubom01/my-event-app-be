@@ -31,10 +31,15 @@ class FriendService:
         return response.id
 
     @staticmethod
-    def get_list_friend_request(db=None, page: int = None, page_size: int = None, user_id: str = None):
-        friend_requests = crud_friend.get_list_request(db=db, page=page, page_size=page_size, user_id=user_id)
+    def get_list_friend_request(db=None, page: int = None, page_size: int = None, user_id: str = None, status: int = None):
+        if status == 0:
+            friend_requests = crud_friend.get_list_request(db=db, page=page, page_size=page_size, user_id=user_id)
+        else:
+            friend_requests = crud_friend.get_list_send(db=db, page=page, page_size=page_size, user_id=user_id)
         for friend_request in friend_requests.items:
             user = crud_user.get(db=db, id=friend_request.friend_id)
+            if friend_request.friend_id == user_id:
+                friend_request.friend_id = friend_request.user_id
             friend_request.username = user.username
             friend_request.first_name = user.first_name
             friend_request.last_name = user.last_name

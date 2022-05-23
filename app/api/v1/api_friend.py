@@ -30,10 +30,10 @@ def approve_friend_request(req_data: ApproveFriendRequest = None, db: Session = 
 
 
 @router.get('/request', dependencies=[Depends(login_required)], response_model=DataResponse[ListFriendRequest])
-def get_list_friend_requests(current_user: UserDetail = Depends(login_required),
+def get_list_friend_requests(current_user: UserDetail = Depends(login_required), status: int = 0,
                              pagination: PaginationParamsRequest = Depends(), db: Session = Depends(deps.get_db)):
     response = FriendService.get_list_friend_request(db=db, page=pagination.page, page_size=pagination.page_size,
-                                                     user_id=current_user.id)
+                                                     user_id=current_user.id, status=status)
     return DataResponse().success_response(data=response)
 
 
